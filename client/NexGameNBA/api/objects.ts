@@ -40,3 +40,14 @@ export interface Team {
   full_name?: string
   abbreviation?: string
 }
+
+export interface PredictRequestItem {
+    regular: boolean,
+    playoffs: boolean,
+    away: string,
+    home: string,
+    spread: number,
+    total: number,
+    moneyline_away: number,
+    moneyline_home: number,
+}

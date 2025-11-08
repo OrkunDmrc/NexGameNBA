@@ -94,7 +94,7 @@ export default function Index() {
                 },
               }) :
               router.push(
-                `/prediction?away=${match.visitor_team?.full_name}&home=${match.home_team?.full_name}`)
+                `/prediction?away=${match.visitor_team?.full_name}&home=${match.home_team?.full_name}&postSeason=${match.postseason}`)
             }} />
         ))}
       </ScrollView>

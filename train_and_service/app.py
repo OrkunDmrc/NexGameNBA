@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import joblib
 import pandas as pd
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 
 class Item(BaseModel):
     regular: bool
@@ -15,6 +16,19 @@ class Item(BaseModel):
 #http://127.0.0.1:8000
 #uvicorn app:app --reload
 app = FastAPI()
+
+origins = [
+    "http://localhost:8081",
+]
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def read_root():

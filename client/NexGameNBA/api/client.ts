@@ -1,6 +1,7 @@
 
 import { toast } from "@/component/toast";
 import axios, { AxiosError } from "axios";
+import { PredictRequestItem } from "./objects";
 
 axios.defaults.baseURL = "https://localhost:44380/api/";
 axios.defaults.withCredentials = true;
@@ -46,6 +47,7 @@ axios.interceptors.response.use(
           break;
       }
     } else {
+      toast(String("Network or CORS error:"), "error", error.message);
       console.error("Network or CORS error:", error.message);
     }
     return Promise.reject(error);
@@ -60,9 +62,15 @@ const methods = {
 };
 
 const balldontlie = {
-    getGamesByDate: async (date: string) => await methods.get(`https://api.balldontlie.io/v1/games?dates[]=${date}`)
+  getGamesByDate: async (date: string) => await methods.get(`https://api.balldontlie.io/v1/games?dates[]=${date}`)
+}
+
+const train = {
+  get:  async () => await methods.get("http://127.0.0.1:8000"),
+  getTotalWinnerPredicts: async (data: PredictRequestItem) => await methods.post("http://127.0.0.1:8000/get_total_winner_results", data)
 }
 
 export const request = {
-    balldontlie
+    balldontlie,
+    train
 }
