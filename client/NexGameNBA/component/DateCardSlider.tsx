@@ -2,13 +2,13 @@ import { colors } from '@/app/utils';
 import { DateContext } from '@/contexts/DateContext';
 import React, { useContext } from 'react';
 import {
-    Dimensions,
-    FlatList,
-    ListRenderItemInfo,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  FlatList,
+  ListRenderItemInfo,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 const screenWidth = Dimensions.get('window').width;
@@ -27,6 +27,7 @@ const formatMonth = (date: Date): string =>
 const generateNextNDates = (n: number): Date[] => {
   const dates: Date[] = [];
   const today = new Date();
+  today.setDate(today.getDate() - 3);
   for (let i = 0; i < n; i++) {
     const nextDate = new Date(today);
     nextDate.setDate(today.getDate() + i);
@@ -41,7 +42,7 @@ const DateCardSlider: React.FC = () => {
         throw new Error('DateDisplay must be used within a DateProvider');
     }
     const { selectedDate, setSelectedDate } = context;
-    const dates: Date[] = generateNextNDates(30);
+    const dates: Date[] = generateNextNDates(7);
 
     const renderItem = ({ item }: ListRenderItemInfo<Date>) => {
     const itemString = item.toDateString();

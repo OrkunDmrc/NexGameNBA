@@ -9,5 +9,5 @@ export default function DateText(){
         throw new Error('DateDisplay must be used within a DateProvider');
     }
     const { selectedDate } = context;
-    return <Text style={{fontSize: 20, color: colors.yellow, fontWeight: "bold"}}>{selectedDate}</Text>
+    return <Text style={{fontSize: 20, color: colors.yellow, fontWeight: "bold", marginBottom: 5}}>{selectedDate}</Text>
 }
