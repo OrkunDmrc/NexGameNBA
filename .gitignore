@@ -1,0 +1,125 @@
+# ======================================
+# GLOBAL IGNORE RULES
+# ======================================
+
+# Node / Python / Logs / Temp files
+node_modules/
+__pycache__/
+*.py[cod]
+*.so
+*.log
+*.tmp
+*.swp
+*.swo
+*.pid
+*.seed
+*.bak
+
+# ======================================
+# CLIENT (React / React Native / Expo)
+# ======================================
+client/node_modules/
+client/build/
+client/dist/
+client/.expo/
+client/.expo-shared/
+
+# Environment files
+client/.env
+.env
+.env.*
+
+# Cache & Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+.pnpm-debug.log
+.expo/
+expo-debug.log
+
+# System
+.DS_Store
+Thumbs.db
+
+# ======================================
+# PYTHON BACKEND (train_and_service)
+# ======================================
+
+# Virtual environments
+train_and_service/.venv/
+.venv/
+venv/
+ENV/
+env/
+
+# Compiled Python files
+*.pyc
+*.pyo
+*.pyd
+
+# Training and model artifacts
+train_and_service/**/*.pkl
+train_and_service/**/*.pickle
+train_and_service/**/*.h5
+train_and_service/**/*.pt
+train_and_service/**/*.joblib
+train_and_service/**/*.ckpt
+
+# Data files
+train_and_service/**/*.csv
+train_and_service/**/*.tsv
+train_and_service/**/*.xls
+train_and_service/**/*.xlsx
+train_and_service/**/*.jsonl
+
+# Jupyter / Notebooks
+.ipynb_checkpoints
+*.ipynb_checkpoints
+
+# Python packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Test / Coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# ======================================
+# IDEs / Editors
+# ======================================
+.vscode/
+.idea/
+*.iml
+*.sublime-project
+*.sublime-workspace
+
+# ======================================
+# CUSTOM FOLDERS (if any)
+# ======================================
+# Add your own as needed
+# e.g.
+# client/static/generated/
+# train_and_service/output/
