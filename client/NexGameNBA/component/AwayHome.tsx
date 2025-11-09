@@ -1,4 +1,4 @@
-import { colors, logos } from "@/app/utils";
+import { colors, getLogo } from "@/app/utils";
 import { Image, Text, TextInput, View } from "react-native";
 
 type AwayHomeProps = {
@@ -12,7 +12,7 @@ export default function AwayHome({away, home}: AwayHomeProps){
         <View style={{margin: 5, alignItems: "center", width: "40%"}}>
           <Text style={{color: colors.white, textAlign: "center"}}>Away</Text>
           <Image
-            source={logos["Nuggets"/*homeTeam*/]}
+            source={{uri: getLogo(away)}}
             style={{width: 50, height: 50, marginVertical: 10}}
             resizeMode="contain"
           />
@@ -35,7 +35,7 @@ export default function AwayHome({away, home}: AwayHomeProps){
         <View style={{margin: 5, alignItems: "center", width: "40%"}}>
           <Text style={{color: colors.white, textAlign: "center"}}>Home</Text>
           <Image
-            source={logos["Nuggets"/*homeTeam*/]}
+            source={{uri: getLogo(home)}}
             style={{width: 50, height: 50, marginVertical: 10}}
             resizeMode="contain"
           />

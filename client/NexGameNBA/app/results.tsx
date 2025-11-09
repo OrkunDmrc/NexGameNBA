@@ -3,7 +3,7 @@ import ResultContainer from "@/component/ResultContainer";
 import { useSearchParams } from "expo-router/build/hooks";
 import { Image, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { colors, logos } from "./utils";
+import { colors, getLogo } from "./utils";
 
 export default function Results() {
   const [
@@ -60,8 +60,8 @@ export default function Results() {
         marginVertical: 5
       }}>
         <Image
-          source={logos["Nuggets"/*homeTeam*/]}
-          style={{width: 50, height: 50}}
+          source={{uri: getLogo(params.winnerFullName)}}
+          style={{width: 50, height: 50, margin: 5}}
           resizeMode="contain"
         />
         <Text style={{color: colors.white, fontWeight: "bold", fontSize: 20}}>{params.winnerFullName}</Text>

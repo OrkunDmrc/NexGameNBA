@@ -1,4 +1,4 @@
-import { colors, logos } from "@/app/utils";
+import { colors, getLogo } from "@/app/utils";
 import { GestureResponderEvent, Image, Text, TouchableOpacity, View } from "react-native";
 
 
@@ -35,8 +35,8 @@ export default function RouteButton({awayTeam, homeTeam, onPress, awayScore, hom
                     {awayTeam}
                 </Text>
                 <Image
-                    source={logos["Nuggets"/*homeTeam*/]}
-                    style={{width: 30, height: 30}}
+                    source={{uri: getLogo(awayTeam)}}
+                    style={{width: 25, height: 25, marginLeft: 5}}
                     resizeMode="contain"
                 />
             </View>
@@ -57,8 +57,8 @@ export default function RouteButton({awayTeam, homeTeam, onPress, awayScore, hom
             </View>
             <View style={{flexDirection: "row", alignItems: "center"}}>
                 <Image
-                    source={logos["Nuggets"/*homeTeam*/]}
-                    style={{width: 30, height: 30}}
+                    source={{uri: getLogo(homeTeam)}}
+                    style={{width: 25, height: 25, marginRight: 5}}
                     resizeMode="contain"
                 />
                 <Text style={{ color: colors.white, textAlign: "left", fontSize: 15, fontWeight: 'bold', width: 110}}>

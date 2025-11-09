@@ -61,7 +61,7 @@ export default function Index() {
       </View>
       :<ScrollView style={{width: "100%", marginBottom: 50}}>
         {matches?.map((match) => (
-          <RouteButton 
+          <RouteButton key={match.id}
             awayTeam={match.visitor_team?.name || ""} 
             homeTeam={match.home_team?.name || ""} 
             awayScore={match.visitor_team_score}

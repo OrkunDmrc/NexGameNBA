@@ -2,7 +2,7 @@ import BaseTextInput from "@/component/BaseTextInput";
 import Line from "@/component/Line";
 import { useSearchParams } from "expo-router/build/hooks";
 import { Image, ScrollView, Text, View } from "react-native";
-import { colors, logos } from "./utils";
+import { colors, getLogo } from "./utils";
 
 export default function Prediction() {
   const [winnerTeam,
@@ -67,8 +67,8 @@ export default function Prediction() {
         marginVertical: 5
       }}>
         <Image
-          source={logos["Nuggets"/*homeTeam*/]}
-          style={{width: 50, height: 50}}
+          source={{uri: getLogo(params.winnerTeam)}}
+          style={{width: 50, height: 50, margin: 5}}
           resizeMode="contain"
         />
         <Text style={{color: colors.white, fontWeight: "bold", fontSize: 20}}>{params.winnerTeam}</Text>

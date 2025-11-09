@@ -1,4 +1,4 @@
-import { colors, logos } from "@/app/utils";
+import { colors, getLogo } from "@/app/utils";
 import { Image, Text, View } from "react-native";
 
 type ResultContainerProps = {
@@ -28,8 +28,8 @@ export default function ResultContainer({text, away, home, awayScore, homeScore,
                         {away}
                     </Text>
                     <Image
-                        source={logos["Nuggets"/*homeTeam*/]}
-                        style={{width: 30, height: 30}}
+                        source={{uri: getLogo(away)}}
+                        style={{width: 30, height: 30, margin: 5}}
                         resizeMode="contain"
                     />
                 </View>
@@ -47,8 +47,8 @@ export default function ResultContainer({text, away, home, awayScore, homeScore,
                 </View>
                 <View style={{flexDirection: "row", alignItems: "center"}}>
                     <Image
-                        source={logos["Nuggets"/*homeTeam*/]}
-                        style={{width: 30, height: 30}}
+                        source={{uri: getLogo(home)}}
+                        style={{width: 30, height: 30, margin: 5}}
                         resizeMode="contain"
                     />
                     <Text style={{color: colors.white, fontSize: 15, fontWeight: 'bold'}}>
