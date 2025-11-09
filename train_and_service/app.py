@@ -1,3 +1,4 @@
+import json
 import os
 from fastapi import Depends, FastAPI, HTTPException, Request, status
 import joblib
@@ -17,7 +18,10 @@ class Item(BaseModel):
 #http://127.0.0.1:8000
 #uvicorn app:app --reload
 
-API_KEY = os.getenv("API_KEY", "c-t6J2rNglNlUH0fOm95He3mZmgbAAGL_5v9nzSkjSw")
+with open("dev.json") as f:
+    api_keys = json.load(f)
+
+API_KEY = os.getenv("API_KEY", api_keys.get("service-API-key", ""))
 API_KEY_NAME = "Authorization"
 
 def verify_api_key(request: Request):

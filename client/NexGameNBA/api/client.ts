@@ -2,15 +2,16 @@
 import { toast } from "@/component/toast";
 import axios, { AxiosError } from "axios";
 import { BetsForm } from "./objects";
+const apiKeys = require("../dev.json");
 
 //axios.defaults.withCredentials = true;
 
 axios.interceptors.request.use(request => {
   request.headers["Content-Type"] = "application/json";
   if(request.url?.includes("balldontlie")){
-    request.headers["Authorization"] = "308a857a-9732-4a30-bd2a-7a3dc014cf2b";
+    request.headers["Authorization"] = apiKeys["balldontlie-API-Key"];
   }else{
-    request.headers["Authorization"] = "c-t6J2rNglNlUH0fOm95He3mZmgbAAGL_5v9nzSkjSw";
+    request.headers["Authorization"] = apiKeys["service-API-key"];
   }
   return request;
 });

@@ -77,6 +77,7 @@ export default function Bets() {
       moneyline_away: americanToDecimal(moneylineAwayNum),
       moneyline_home: americanToDecimal(moneylineHomeNum)
     });
+    console.log(res);
     if(res.status === 200){
       const prediction = res.data as Prediction
       setIsLoading(() => false);
