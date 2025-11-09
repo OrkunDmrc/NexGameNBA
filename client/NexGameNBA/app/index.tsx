@@ -7,7 +7,7 @@ import RouteButton from "@/component/RouteButton";
 import { DateContext } from "@/contexts/DateContext";
 import { router } from "expo-router";
 import { useContext, useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, View } from "react-native";
+import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { colors } from "./utils";
 
 export default function Index() {
@@ -53,8 +53,12 @@ export default function Index() {
       }}
     >
       <DateCardSlider />
-      <Line/>
       <DateText/>
+      <View style={{flexDirection: "row", justifyContent: "space-evenly", width: "100%"}}>
+        <Text style={{fontWeight: "bold", color: colors.white}}>Away</Text>
+        <Text style={{fontWeight: "bold", color: colors.white}}>Home</Text>
+      </View>
+      <Line/>
       {isLoading ? 
       <View style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
         <ActivityIndicator size="large" color={colors.white}/>

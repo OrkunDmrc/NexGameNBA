@@ -66,6 +66,10 @@ export default function Results() {
         />
         <Text style={{color: colors.white, fontWeight: "bold", fontSize: 20}}>{params.winnerFullName}</Text>
       </View>
+      <View style={{flexDirection: "row", justifyContent: "space-evenly"}}>
+        <Text style={{fontWeight: "bold", color: colors.white}}>Away</Text>
+        <Text style={{fontWeight: "bold", color: colors.white}}>Home</Text>
+      </View>
       <Line/>
       <ScrollView style={{width: "100%", marginBottom: 50}}>
         <ResultContainer
