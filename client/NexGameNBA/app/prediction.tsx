@@ -1,38 +1,50 @@
-import { request } from "@/api/client";
-import AwayHome from "@/component/AwayHome";
 import BaseTextInput from "@/component/BaseTextInput";
 import Line from "@/component/Line";
-import SubmitButton from "@/component/SubmitButton";
 import { useSearchParams } from "expo-router/build/hooks";
-import { useState } from "react";
-import { ScrollView, View } from "react-native";
-import { colors } from "./utils";
+import { Image, ScrollView, Text, View } from "react-native";
+import { colors, logos } from "./utils";
 
 export default function Prediction() {
-  const [away, home, postSeason] = useSearchParams();
+  const [winnerTeam,
+    totalScore,
+    totalScoreq1,
+    totalScoreq2,
+    totalScoreq3,
+    totalScoreq4,
+    totalScoreOt,
+    total,
+    spread,
+    moneylineAway,
+    moneylineHome] = useSearchParams();
   const params = {
-    away: away[1],
-    home: home[1],
-    postSeason: postSeason[1].toLowerCase() === "true"
+    winnerTeam: winnerTeam[1],
+    totalScore: Number(totalScore[1]),
+    totalScoreh1: Number(totalScoreq1[1]) + Number(totalScoreq2[1]),
+    totalScoreq1: totalScoreq1[1],
+    totalScoreq2: totalScoreq2[1],
+    totalScoreh2: Number(totalScoreq3[1]) + Number(totalScoreq4[1]),
+    totalScoreq3: totalScoreq3[1],
+    totalScoreq4: totalScoreq4[1],
+    totalScoreOt: Number(totalScoreOt[1]),
+    total: Number(total[1]),
+    spread: Number(spread[1]),
+    moneylineAway: Number(moneylineAway[1]),
+    moneylineHome: Number(moneylineHome[1])
   }
-  const [spread, setSpread] = useState<string>("");
-  const [total, setTotal] = useState<string>("");
-  const [moneylineAway, setMoneylineAway] = useState<string>("");
-  const [moneylineHome, setMoneylineHome] = useState<string>("");
-  async function submit(){
-    const res = await request.train.getTotalWinnerPredicts({
-      regular: params.postSeason === false,
-      playoffs: params.postSeason === true,
-      away: params.away,
-      home: params.home,
-      spread: Number(spread.replace(",",".")),
-      total: Number(total.replace(",",".")),
-      moneyline_away: Number(moneylineAway.replace(",",".")),
-      moneyline_home: Number(moneylineHome.replace(",","."))
-    });
-    if(res){
-      console.log(res);
-    }
+  const moneyLineCal = Math.abs(params.moneylineAway - params.moneylineHome);
+  const winnerTeamRisk = {
+    text: moneyLineCal < 0.9 ? "(High Risk)" : moneyLineCal < 1.5 ? "(Medium Risk)" : "(Low Risk)",
+    color: moneyLineCal < 0.9 ? colors.secondaryColor : moneyLineCal < 1.5 ? colors.yellow : colors.green,
+  }
+  const totalScoreCal = Math.abs(params.total - params.totalScore);
+  const totalScoreCal2 = Math.abs(Math.abs(params.total - params.totalScore) - params.spread);
+  const totalScoreRisk = {
+    text: totalScoreCal < params.spread ? "(Low Risk)" : totalScoreCal2 <= 15 ? "(Medium Risk)" : "(High Risk)",
+    color: totalScoreCal < params.spread ? colors.green : totalScoreCal2 <= 15 ? colors.yellow : colors.secondaryColor
+  }
+  const totalScoreOtRisk = {
+    text: params.totalScoreOt < 11 ? "(Low Risk)" : params.totalScoreOt < 20 ? "(Medium Risk)" : "(High Risk)",
+    color: params.totalScoreOt < 11 ? colors.green : params.totalScoreOt < 20 ? colors.yellow : colors.secondaryColor,
   }
   return (
     <View
@@ -44,14 +56,41 @@ export default function Prediction() {
         padding: 10
       }}
     >
-      <AwayHome away={params.away} home={params.home}/>
-      <Line />
+      <Text style={{color: colors.white}}>Winner {winnerTeamRisk.text}</Text>
+      <View style={{
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        backgroundColor: winnerTeamRisk.color,
+        borderRadius: 10,
+        padding: 5,
+        marginVertical: 5
+      }}>
+        <Image
+          source={logos["Nuggets"/*homeTeam*/]}
+          style={{width: 50, height: 50}}
+          resizeMode="contain"
+        />
+        <Text style={{color: colors.white, fontWeight: "bold", fontSize: 20}}>{params.winnerTeam}</Text>
+      </View>
+      <Line/>
       <ScrollView style={{width: "100%", marginBottom: 50}}>
-        <BaseTextInput value={spread} onChange={(e) => setSpread(e.nativeEvent.text)} text="Spread" errorText=""/>
-        <BaseTextInput value={total} onChange={(e) => setTotal(e.nativeEvent.text)} text="Total" errorText=""/>
-        <BaseTextInput value={moneylineAway} onChange={(e) => setMoneylineAway(e.nativeEvent.text)} text="Moneyline Away" errorText=""/>
-        <BaseTextInput value={moneylineHome} onChange={(e) => setMoneylineHome(e.nativeEvent.text)} text="Moneyline Home" errorText=""/>
-        <SubmitButton text="PREDICT" onPress={submit}/>
+        <BaseTextInput 
+          value={`${params.totalScore} (${params.totalScore > params.total ? "Under" : "Over"})`} 
+          text={`Total Score ${totalScoreRisk.text}`} 
+          backgroundColor={totalScoreRisk.color} 
+          editable={false}/>
+        <BaseTextInput value={params.totalScoreh1.toString()} text="1st Half Total Score (Medium Risk)"  backgroundColor={colors.yellow} editable={false}/>
+        <BaseTextInput value={params.totalScoreq1} text="1st Quarter Total Score (High Risk)"  backgroundColor={colors.secondaryColor} editable={false}/>
+        <BaseTextInput value={params.totalScoreq2} text="2nd Quarter Total Score (High Risk)"  backgroundColor={colors.secondaryColor} editable={false}/>
+        <BaseTextInput value={params.totalScoreh2.toString()} text="2nd Half Total Score (Medium Risk)"  backgroundColor={colors.yellow} editable={false}/>
+        <BaseTextInput value={params.totalScoreq3} text="3rd Quarter Total Score (High Risk)"  backgroundColor={colors.secondaryColor} editable={false}/>
+        <BaseTextInput value={params.totalScoreq4} text="4th Quarter Total Score (High Risk)"  backgroundColor={colors.secondaryColor} editable={false}/>
+        <BaseTextInput 
+          value={params.totalScoreOt < 11 ? "0" : params.totalScoreOt.toString()} 
+          text={`Over Time Total Score ${totalScoreOtRisk.text}`}  
+          backgroundColor={totalScoreOtRisk.color} 
+          editable={false}/>
       </ScrollView>
     </View>
   );

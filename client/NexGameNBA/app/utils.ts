@@ -2,7 +2,7 @@ export const colors = {
     primaryColor: "#00438C",
     secondaryColor: "#C52B2F",
     routeButtonColor: "#01579B",
-    yellow: "#F6C810",
+    yellow: "#d3aa05",
     white: "#eee",
     green: "#66BB6A",
 }

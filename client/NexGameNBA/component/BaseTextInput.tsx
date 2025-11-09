@@ -6,16 +6,18 @@ type BaseTextInputProps = {
     text: string,
     errorText?: string
     onChange?: ((e: TextInputChangeEvent) => void) | undefined;
+    editable?: boolean
+    backgroundColor?: string
 }
 
-export default function BaseTextInput({value, text, errorText, onChange}: BaseTextInputProps){
+export default function BaseTextInput({value, text, errorText, onChange, editable = true, backgroundColor = colors.routeButtonColor}: BaseTextInputProps){
     return (
         <>
             <Text style={{color: colors.white, marginTop: 5, textAlign: "center"}}>{text}</Text>
             <TextInput style={{
                 textAlign: "center",
                 cursor: "white",
-                backgroundColor: colors.routeButtonColor, 
+                backgroundColor: backgroundColor, 
                 borderColor: errorText ? colors.secondaryColor : colors.white,
                 borderWidth: 1,
                 paddingVertical: 5,
@@ -30,7 +32,8 @@ export default function BaseTextInput({value, text, errorText, onChange}: BaseTe
                 marginVertical: 5}} 
                 keyboardType="numeric" 
                 value={value}
-                onChange={onChange} />
+                onChange={onChange}
+                editable={editable}/>
             {errorText && <Text style={{color: colors.secondaryColor}}>{errorText}</Text>}
         </>
         

@@ -80,7 +80,7 @@ def predict_winner_team(regular, playoffs, away, home, spread, total, moneyline_
     total_score_q3_pred = total_score_q3_model.predict(df)[0]
     total_score_q4_pred = total_score_q4_model.predict(df)[0]
     total_score_ot_pred = total_score_ot_model.predict(df)[0]
-    request(regular, playoffs, away, home, spread, total, moneyline_away, moneyline_home)
+    #request(regular, playoffs, away, home, spread, total, moneyline_away, moneyline_home)
     return [f"winner_team:{home if winner_team_pred == 1 else away}",
              f"total_score:{str(round(total_score_pred, 0))}",
              f"total_score_q1:{str(round(total_score_q1_pred, 0))}",

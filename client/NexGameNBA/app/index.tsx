@@ -93,14 +93,18 @@ export default function Index() {
                     (match.home_ot1 || 0) + (match.home_ot2 || 0) + (match.home_ot3 || 0),
                 },
               }) :
-              router.push(
-                `/prediction?away=${match.visitor_team?.full_name}&home=${match.home_team?.full_name}&postSeason=${match.postseason}`)
+              router.push({
+                pathname: "/bets",
+                params: {
+                  away: match.visitor_team?.full_name,
+                  home: match.home_team?.full_name,
+                  postseason: match.postseason?.toString()
+                }
+              });
             }} />
         ))}
       </ScrollView>
       }
-      
-      
     </View>
   );
 }

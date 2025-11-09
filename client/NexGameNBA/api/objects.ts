@@ -41,7 +41,7 @@ export interface Team {
   abbreviation?: string
 }
 
-export interface PredictRequestItem {
+export interface BetsForm {
     regular: boolean,
     playoffs: boolean,
     away: string,
@@ -50,4 +50,14 @@ export interface PredictRequestItem {
     total: number,
     moneyline_away: number,
     moneyline_home: number,
+}
+
+export interface Prediction {
+    winner_team: string,
+    total_score: number,
+    total_score_q1: number,
+    total_score_q2: number,
+    total_score_q3: number,
+    total_score_q4: number,
+    total_score_ot: number
 }

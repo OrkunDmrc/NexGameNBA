@@ -9,6 +9,7 @@ export default function RootLayout() {
   const currentPage = segments.join('/');
   const pageTitles: { [key: string]: string } = {
     index: 'Nex Game\nNBA',
+    bets: 'Bets',
     prediction: 'Prediction',
     results: 'Results',
   };
@@ -21,7 +22,7 @@ export default function RootLayout() {
           resizeMode="contain"
         />
         <View>
-          <Text style={{color: "white", fontSize: 30, textAlign: "center"}}>
+          <Text style={{color: "white", fontSize: 30, textAlign: "center", fontWeight: "bold"}}>
             {pageTitles[currentPage] || 'Nex Game\nNBA'}
           </Text>
         </View>
@@ -29,6 +30,7 @@ export default function RootLayout() {
       <DateProvider>
         <Stack>
           <Stack.Screen name="index" options={{headerShown: false}}/>
+          <Stack.Screen name="bets" options={{headerShown: false}}/>
           <Stack.Screen name="prediction" options={{headerShown: false}}/>
           <Stack.Screen name="results" options={{headerShown: false}}/>
         </Stack>
