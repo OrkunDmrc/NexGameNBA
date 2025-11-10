@@ -48,7 +48,13 @@ Thumbs.db
 # ======================================
 
 # Virtual environments
-train_and_service/.venv/
+train/.venv/
+.venv/
+venv/
+ENV/
+env/
+
+service/.venv/
 .venv/
 venv/
 ENV/
@@ -60,19 +66,19 @@ env/
 *.pyd
 
 # Training and model artifacts
-train_and_service/**/*.pkl
-train_and_service/**/*.pickle
-train_and_service/**/*.h5
-train_and_service/**/*.pt
-train_and_service/**/*.joblib
-train_and_service/**/*.ckpt
+train/**/*.pkl
+train/**/*.pickle
+train/**/*.h5
+train/**/*.pt
+train/**/*.joblib
+train/**/*.ckpt
 
 # Data files
-train_and_service/**/*.csv
-train_and_service/**/*.tsv
-train_and_service/**/*.xls
-train_and_service/**/*.xlsx
-train_and_service/**/*.jsonl
+train/**/*.csv
+train/**/*.tsv
+train/**/*.xls
+train/**/*.xlsx
+train/**/*.jsonl
 
 # Jupyter / Notebooks
 .ipynb_checkpoints

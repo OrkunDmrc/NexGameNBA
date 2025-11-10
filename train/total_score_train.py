@@ -5,14 +5,14 @@ from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.svm import SVR
 from sklearn.metrics import r2_score
-from xgboost import XGBRegressor
+#from xgboost import XGBRegressor
 import joblib
 
 df = pd.read_csv('new_nba_2008_2025.csv')
-df = df.loc[~((df['season'] == 2025))]
-df = df.drop(columns=['season', 'score_away', 'score_home', 'home_winner', "score_total",
-                      	"q2_away",	"q3_away",	"q4_away",	"ot_away",
-                      	"q2_home",	"q3_home",	"q4_home",	"ot_home"
+#df = df.loc[~((df['season'] == 2025))]
+df = df.drop(columns=['season', 'score_away', 'score_home', 'home_winner',
+                      "q1_away",	"q2_away",	"q3_away",	"q4_away",	"ot_away",
+                        	"q1_home",	"q2_home",	"q3_home",	"q4_home",	"ot_home"
                       #, 'away_rat', 'home_rat'
                       #,'away_p0','home_p0','away_p1','home_p1',"away_p2","home_p2","away_p3",
                     #"home_p3","away_p4","home_p4","away_p5","home_p5","away_p6","home_p6",
@@ -21,8 +21,6 @@ df = df.drop(columns=['season', 'score_away', 'score_home', 'home_winner', "scor
                       ])
 
 #df['home_winner'] = df['home_winner'].astype(int)
-df["q1_total"] = df["q1_home"] + df["q1_away"]
-df = df.drop(columns=["q1_home", "q1_away"])
 
 le_away = LabelEncoder()
 le_home = LabelEncoder()
@@ -36,14 +34,14 @@ df.dropna(axis=0, inplace=True)
 print("count:", df['away'].count())
 
 models = {
-    'Linear Regression': LinearRegression(),
+    #'Linear Regression': LinearRegression(),
     'Random Forest': RandomForestRegressor(),
-    'Gradient Boosting': GradientBoostingRegressor(),
-    'XGBoost': XGBRegressor(),
-    'SVR': SVR()
+    #'Gradient Boosting': GradientBoostingRegressor(),
+    #'XGBoost': XGBRegressor(),
+    #'SVR': SVR()
 }
-X_train = df.drop(columns=['q1_total'])
-y_train = df['q1_total']
+X_train = df.drop(columns=['score_total'])
+y_train = df['score_total']
 
 results = []
 best_model_obj = None
@@ -62,10 +60,10 @@ for name, model in models.items():
 
 print(f"Best Model: {best_model_name} with R2 Score: {best_r2:.4f}")
 
-joblib.dump(best_model_obj, f"total_score_q1_pkls/total_score_{best_model_name.replace(' ', '_').lower()}_model.pkl")
-joblib.dump(X_train.columns.tolist(), "total_score_q1_pkls/total_score_features.pkl")
-joblib.dump(le_away, 'total_score_q1_pkls/total_score_label_encoder_away.pkl')
-joblib.dump(le_home, 'total_score_q1_pkls/total_score_label_encoder_home.pkl')
-print(f"\nSaved best model as: total_score_q1_{best_model_name.replace(' ', '_').lower()}_model.pkl")
+joblib.dump(best_model_obj, f"total_score_pkls/total_score_{best_model_name.replace(' ', '_').lower()}_model.pkl", compress=("lzma", 3))
+joblib.dump(X_train.columns.tolist(), "total_score_pkls/total_score_features.pkl")
+joblib.dump(le_away, 'total_score_pkls/total_score_label_encoder_away.pkl')
+joblib.dump(le_home, 'total_score_pkls/total_score_label_encoder_home.pkl')
+print(f"\nSaved best model as: total_score_{best_model_name.replace(' ', '_').lower()}_model.pkl")
 #loaded_model=  joblib.load('gradient_boosting_model.pkl')
 #decoded_away = le_away.inverse_transform(df['away'])
