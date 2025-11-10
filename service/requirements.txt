@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+pandas
+joblib
+scikit-learn==1.7.1
+huggingface-hub
+python-dotenv
