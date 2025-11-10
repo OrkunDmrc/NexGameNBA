@@ -9,7 +9,11 @@ from sklearn.metrics import r2_score
 import joblib
 
 df = pd.read_csv('new_nba_2008_2025.csv')
-df = df.loc[~((df['season'] == 2025))]
+df = df.loc[~((df['season'] == 2008))]
+df = df.loc[~((df['season'] == 2009))]
+df = df.loc[~((df['season'] == 2010))]
+df = df.loc[~((df['season'] == 2011))]
+df = df.loc[~((df['season'] == 2012))]
 df = df.drop(columns=['season', 'score_away', 'score_home', 'home_winner', "score_total",
                       "q1_away",	"q2_away",	"q3_away",	"ot_away",
                         	"q1_home",	"q2_home",	"q3_home",	"ot_home"
@@ -62,7 +66,7 @@ for name, model in models.items():
 
 print(f"Best Model: {best_model_name} with R2 Score: {best_r2:.4f}")
 
-joblib.dump(best_model_obj, f"total_score_q4_pkls/total_score_q4_{best_model_name.replace(' ', '_').lower()}_model.pkl", compress=("lzma", 3))
+joblib.dump(best_model_obj, f"total_score_q4_pkls/total_score_q4_{best_model_name.replace(' ', '_').lower()}_model.pkl", compress=("lzma", 9))
 joblib.dump(X_train.columns.tolist(), "total_score_q4_pkls/total_score_features.pkl")
 joblib.dump(le_away, 'total_score_q4_pkls/total_score_label_encoder_away.pkl')
 joblib.dump(le_home, 'total_score_q4_pkls/total_score_label_encoder_home.pkl')
