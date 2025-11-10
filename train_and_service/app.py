@@ -74,6 +74,24 @@ def get_prediction(item, model):
 def read_root():
     return {"message": "Hello, world!"}
 
+@app.post("/get_winner_prediction")
+def get_winner_prediction(item: Item):
+    file_path = hf_hub_download(repo_id=os.getenv("REPO_ID"), filename=os.getenv("WINNER_TEAM_MODEL_FILE_NAME"))
+    winner_team_model = joblib.load(file_path) #winner_team_pkls/winner_team_gradientboostingclassifier_model.pkl
+    winner_team_pred = get_prediction(item, winner_team_model)
+    return {
+        "winner_team": item.home if winner_team_pred == 1 else item.away
+    }
+
+@app.post("/get_total_score_prediction")
+def get_total_score_prediction(item: Item):
+    file_path = hf_hub_download(repo_id=os.getenv("REPO_ID"), filename=os.getenv("TOTAL_SCORE_MODEL_FILE_NAME"))
+    total_score_model = joblib.load(file_path) #'total_score_pkls/total_score_random_forest_model.pkl'
+    total_score_pred = get_prediction(item, total_score_model)
+    return {
+        "total_score": int(round(total_score_pred, 0))
+    }
+
 @app.post("/get_total_winner_prediction")
 def get_total_winner_prediction(item: Item):
     file_path = hf_hub_download(repo_id=os.getenv("REPO_ID"), filename=os.getenv("WINNER_TEAM_MODEL_FILE_NAME"))
