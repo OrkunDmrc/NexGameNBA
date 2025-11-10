@@ -1,10 +1,12 @@
-import json
 import os
+from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Request, status
+from huggingface_hub import hf_hub_download
 import joblib
 import pandas as pd
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
 
 class Item(BaseModel):
     regular: bool
@@ -18,15 +20,13 @@ class Item(BaseModel):
 #http://127.0.0.1:8000
 #uvicorn app:app --reload
 
-with open("dev.json") as f:
-    api_keys = json.load(f)
-
-API_KEY = os.getenv("API_KEY", api_keys.get("service-API-key", ""))
-API_KEY_NAME = "Authorization"
+load_dotenv()
+BALLEDONTLIE_API_KEY = os.getenv("BALLEDONTLIE_API_KEY")
+SERVICE_API_KEY = os.getenv("SERVICE_API_KEY")
 
 def verify_api_key(request: Request):
-    client_key = request.headers.get(API_KEY_NAME) or request.query_params.get("api_key")
-    if client_key != API_KEY:
+    client_key = request.headers.get("Authorization") or ""
+    if client_key != SERVICE_API_KEY:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or missing API Key",
@@ -46,10 +46,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-def get_prediction(item, model, le_away, le_home):
-    h = le_home.transform([item.home])[0]
+file_path = hf_hub_download(repo_id=os.getenv("REPO_ID"), filename=os.getenv("LE_AWAY_FILE_NAME"))
+le_away = joblib.load(file_path)#'winner_team_pkls/winner_team_label_encoder_away.pkl'
+file_path = hf_hub_download(repo_id=os.getenv("REPO_ID"), filename=os.getenv("LE_HOME_FILE_NAME"))
+le_home = joblib.load(file_path)#'winner_team_pkls/winner_team_label_encoder_home.pkl'
+def get_prediction(item, model):
     a = le_away.transform([item.away])[0]
+    h = le_home.transform([item.home])[0]
     df = pd.DataFrame([{
         'regular': item.regular,
         'playoffs': item.playoffs,
@@ -73,16 +76,14 @@ def read_root():
 
 @app.post("/get_total_winner_prediction")
 def get_total_winner_prediction(item: Item):
-    winner_team_model = joblib.load('winner_team_pkls/winner_team_gradientboostingclassifier_model.pkl')
-    winner_team_le_away = joblib.load('winner_team_pkls/winner_team_label_encoder_away.pkl')
-    winner_team_le_home = joblib.load('winner_team_pkls/winner_team_label_encoder_home.pkl')
-    #print("winner team",joblib.load("winner_team_pkls/winner_team_features.pkl"))
-    winner_team_pred = get_prediction(item, winner_team_model, winner_team_le_away, winner_team_le_home)
-    total_score_model = joblib.load('total_score_pkls/total_score_random_forest_model.pkl')
-    total_score_le_away = joblib.load('total_score_pkls/total_score_label_encoder_away.pkl')
-    total_score_le_home = joblib.load('total_score_pkls/total_score_label_encoder_home.pkl')
-    #print("total score", joblib.load("total_score_pkls/total_score_features.pkl"))
-    total_score_pred = get_prediction(item, total_score_model, total_score_le_away, total_score_le_home)
+    file_path = hf_hub_download(repo_id=os.getenv("REPO_ID"), filename=os.getenv("WINNER_TEAM_MODEL_FILE_NAME"))
+    winner_team_model = joblib.load(file_path) #winner_team_pkls/winner_team_gradientboostingclassifier_model.pkl
+    winner_team_pred = get_prediction(item, winner_team_model)
+
+    file_path = hf_hub_download(repo_id=os.getenv("REPO_ID"), filename=os.getenv("TOTAL_SCORE_MODEL_FILE_NAME"))
+    total_score_model = joblib.load(file_path) #'total_score_pkls/total_score_random_forest_model.pkl'
+    total_score_pred = get_prediction(item, total_score_model)
+
     return {
         "winner_team": item.home if winner_team_pred == 1 else item.away, 
         "total_score": int(round(total_score_pred, 0))
@@ -90,30 +91,25 @@ def get_total_winner_prediction(item: Item):
 
 @app.post("/get_quareters_prediction")
 def get_quareters_prediction(item: Item):
-    total_score_q1_model = joblib.load('total_score_q1_pkls/total_score_random_forest_model.pkl')
-    total_score_le_q1_away = joblib.load('total_score_q1_pkls/total_score_not_2025_label_encoder_away.pkl')
-    total_score_le_q1_home = joblib.load('total_score_q1_pkls/total_score_not_2025_label_encoder_home.pkl')
-    total_score_q1_pred = get_prediction(item, total_score_q1_model, total_score_le_q1_away, total_score_le_q1_home)
+    file_path = hf_hub_download(repo_id=os.getenv("REPO_ID"), filename=os.getenv("TOTAL_SCORE_Q1_MODEL_FILE_NAME"))
+    total_score_q1_model = joblib.load(file_path)#'total_score_q1_pkls/total_score_q1_random_forest_model.pkl'
+    total_score_q1_pred = get_prediction(item, total_score_q1_model)
 
-    total_score_q2_model = joblib.load('total_score_q2_pkls/total_score_random_forest_model.pkl')
-    total_score_le_q2_away = joblib.load('total_score_q2_pkls/total_score_not_2025_label_encoder_away.pkl')
-    total_score_le_q2_home = joblib.load('total_score_q2_pkls/total_score_not_2025_label_encoder_home.pkl')
-    total_score_q2_pred = get_prediction(item, total_score_q2_model, total_score_le_q2_away, total_score_le_q2_home)
+    file_path = hf_hub_download(repo_id=os.getenv("REPO_ID"), filename=os.getenv("TOTAL_SCORE_Q2_MODEL_FILE_NAME"))
+    total_score_q2_model = joblib.load(file_path)#'total_score_q2_pkls/total_score_q2_random_forest_model.pkl'
+    total_score_q2_pred = get_prediction(item, total_score_q2_model)
 
-    total_score_q3_model = joblib.load('total_score_q3_pkls/total_score_random_forest_model.pkl')
-    total_score_le_q3_away = joblib.load('total_score_q3_pkls/total_score_not_2025_label_encoder_away.pkl')
-    total_score_le_q3_home = joblib.load('total_score_q3_pkls/total_score_not_2025_label_encoder_home.pkl')
-    total_score_q3_pred = get_prediction(item, total_score_q3_model, total_score_le_q3_away, total_score_le_q3_home)
+    file_path = hf_hub_download(repo_id=os.getenv("REPO_ID"), filename=os.getenv("TOTAL_SCORE_Q3_MODEL_FILE_NAME"))
+    total_score_q3_model = joblib.load(file_path)#'total_score_q3_pkls/total_score_q3_random_forest_model.pkl'
+    total_score_q3_pred = get_prediction(item, total_score_q3_model)
 
-    total_score_q4_model = joblib.load('total_score_q4_pkls/total_score_random_forest_model.pkl')
-    total_score_le_q4_away = joblib.load('total_score_q4_pkls/total_score_not_2025_label_encoder_away.pkl')
-    total_score_le_q4_home = joblib.load('total_score_q4_pkls/total_score_not_2025_label_encoder_home.pkl')
-    total_score_q4_pred = get_prediction(item, total_score_q4_model, total_score_le_q4_away, total_score_le_q4_home)
+    file_path = hf_hub_download(repo_id=os.getenv("REPO_ID"), filename=os.getenv("TOTAL_SCORE_Q4_MODEL_FILE_NAME"))
+    total_score_q4_model = joblib.load(file_path)#'total_score_q4_pkls/total_score_q4_random_forest_model.pkl'
+    total_score_q4_pred = get_prediction(item, total_score_q4_model)
 
-    total_score_ot_model = joblib.load('total_score_ot_pkls/total_score_random_forest_model.pkl')
-    total_score_le_ot_away = joblib.load('total_score_ot_pkls/total_score_not_2025_label_encoder_away.pkl')
-    total_score_le_ot_home = joblib.load('total_score_ot_pkls/total_score_not_2025_label_encoder_home.pkl')
-    total_score_ot_pred = get_prediction(item, total_score_ot_model, total_score_le_ot_away, total_score_le_ot_home)
+    file_path = hf_hub_download(repo_id=os.getenv("REPO_ID"), filename=os.getenv("TOTAL_SCORE_OT_MODEL_FILE_NAME"))
+    total_score_ot_model = joblib.load(file_path)#('total_score_ot_pkls/total_score_ot_random_forest_model.pkl'
+    total_score_ot_pred = get_prediction(item, total_score_ot_model)
 
     return {
         "total_score_q1": int(round(total_score_q1_pred, 0)), 
@@ -123,10 +119,9 @@ def get_quareters_prediction(item: Item):
         "total_score_ot": int(round(total_score_ot_pred, 0)),
     }
 
-
 @app.post("/get_all_prediction")
 def get_all_prediction(item: Item):
     return get_total_winner_prediction(item) | get_quareters_prediction(item)
 
-
-
+if __name__ == "__main__":
+    uvicorn.run(app, host="127.0.0.1", port=8000, log_level="info")

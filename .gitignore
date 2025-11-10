@@ -1,7 +1,7 @@
 # ======================================
 # GLOBAL IGNORE RULES
 # ======================================
-dev.json
+config.json
 # Node / Python / Logs / Temp files
 node_modules/
 __pycache__/

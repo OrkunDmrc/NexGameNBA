@@ -2,7 +2,7 @@
 import { toast } from "@/component/toast";
 import axios, { AxiosError } from "axios";
 import { BetsForm } from "./objects";
-const apiKeys = require("../dev.json");
+const apiKeys = require("../config.json");
 
 //axios.defaults.withCredentials = true;
 

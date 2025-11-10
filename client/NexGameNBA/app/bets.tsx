@@ -6,8 +6,8 @@ import Line from "@/component/Line";
 import SubmitButton from "@/component/SubmitButton";
 import { router } from "expo-router";
 import { useSearchParams } from "expo-router/build/hooks";
-import { useState } from "react";
-import { ActivityIndicator, ScrollView, View } from "react-native";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, Keyboard, ScrollView, View } from "react-native";
 import { colors } from "./utils";
 
 export default function Bets() {
@@ -26,6 +26,21 @@ export default function Bets() {
   const [moneylineAwayError, setMoneylineAwayError] = useState<string>("");
   const [moneylineHome, setMoneylineHome] = useState<string>("");
   const [moneylineHomeError, setMoneylineHomeError] = useState<string>("");
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener('keyboardDidShow', (e) => {
+      setKeyboardHeight(e.endCoordinates.height);
+    });
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
   function americanToDecimal(odds: number): number {
     if (odds >= 100) {
       return (odds / 100) + 1;
@@ -77,7 +92,6 @@ export default function Bets() {
       moneyline_away: americanToDecimal(moneylineAwayNum),
       moneyline_home: americanToDecimal(moneylineHomeNum)
     });
-    console.log(res);
     if(res.status === 200){
       const prediction = res.data as Prediction
       setIsLoading(() => false);
@@ -112,11 +126,11 @@ export default function Bets() {
     >
       <AwayHome away={params.away} home={params.home}/>
       <Line />
-      <ScrollView style={{width: "100%", marginBottom: 50}}>
-        <BaseTextInput value={spread} onChange={(e) => setSpread(e.nativeEvent.text)} text="Spread" errorText={spreadError}/>
-        <BaseTextInput value={total} onChange={(e) => setTotal(e.nativeEvent.text)} text="Total" errorText={totalError}/>
-        <BaseTextInput value={moneylineAway} onChange={(e) => setMoneylineAway(e.nativeEvent.text)} text="Moneyline Away" errorText={moneylineAwayError}/>
-        <BaseTextInput value={moneylineHome} onChange={(e) => setMoneylineHome(e.nativeEvent.text)} text="Moneyline Home" errorText={moneylineHomeError}/>
+      <ScrollView style={{width: "100%", marginBottom: keyboardHeight ? keyboardHeight : 50}}>
+        <BaseTextInput value={spread} onChange={(e) => setSpread(e.nativeEvent.text)} text="Spread" errorText={spreadError} maxLength={2}/>
+        <BaseTextInput value={total} onChange={(e) => setTotal(e.nativeEvent.text)} text="Total" errorText={totalError} maxLength={5}/>
+        <BaseTextInput value={moneylineAway} onChange={(e) => setMoneylineAway(e.nativeEvent.text)} text="Moneyline Away" errorText={moneylineAwayError} maxLength={5}/>
+        <BaseTextInput value={moneylineHome} onChange={(e) => setMoneylineHome(e.nativeEvent.text)} text="Moneyline Home" errorText={moneylineHomeError} maxLength={5}/>
         {isLoading ?
         <View style={{alignItems: "center", justifyContent: "center", margin:10 }}>
             <ActivityIndicator size="large" color={colors.white}/>

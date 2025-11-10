@@ -9,7 +9,7 @@ type AwayHomeProps = {
 export default function AwayHome({away, home}: AwayHomeProps){
     return (
         <View style={{flexDirection: "row", justifyContent: "space-around", alignItems: "center"}}>
-        <View style={{margin: 5, alignItems: "center", width: "40%"}}>
+        <View style={{margin: 5, alignItems: "center", width: "45%"}}>
           <Text style={{color: colors.white, textAlign: "center"}}>Away</Text>
           <Image
             source={{uri: getLogo(away)}}
@@ -32,7 +32,7 @@ export default function AwayHome({away, home}: AwayHomeProps){
             padding: 5,
             marginVertical: 5}} editable={false} value={away} />
         </View>
-        <View style={{margin: 5, alignItems: "center", width: "40%"}}>
+        <View style={{margin: 5, alignItems: "center", width: "45%"}}>
           <Text style={{color: colors.white, textAlign: "center"}}>Home</Text>
           <Image
             source={{uri: getLogo(home)}}
