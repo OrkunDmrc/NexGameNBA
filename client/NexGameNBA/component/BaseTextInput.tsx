@@ -1,5 +1,5 @@
 import { colors } from "@/app/utils";
-import { Text, TextInput, TextInputChangeEvent } from "react-native";
+import { NativeSyntheticEvent, NativeTouchEvent, Text, TextInput, TextInputChangeEvent } from "react-native";
 
 type BaseTextInputProps = {
     value: string,
@@ -8,10 +8,11 @@ type BaseTextInputProps = {
     onChange?: ((e: TextInputChangeEvent) => void) | undefined;
     editable?: boolean
     backgroundColor?: string,
-    maxLength?: number
+    maxLength?: number,
+    onPress?: ((e: NativeSyntheticEvent<NativeTouchEvent>) => void) | undefined;
 }
 
-export default function BaseTextInput({value, text, errorText, onChange, editable = true, backgroundColor = colors.routeButtonColor, maxLength}: BaseTextInputProps){
+export default function BaseTextInput({value, text, errorText, onChange, editable = true, backgroundColor = colors.routeButtonColor, maxLength, onPress}: BaseTextInputProps){
     return (
         <>
             <Text style={{color: colors.white, marginTop: 5, textAlign: "center"}}>{text}</Text>
@@ -35,7 +36,8 @@ export default function BaseTextInput({value, text, errorText, onChange, editabl
                 value={value}
                 onChange={onChange}
                 editable={editable}
-                maxLength={maxLength}/>
+                maxLength={maxLength}
+                onPress={onPress}/>
             {errorText && <Text style={{color: colors.secondaryColor}}>{errorText}</Text>}
         </>
         

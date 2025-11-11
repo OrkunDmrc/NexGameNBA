@@ -52,12 +52,28 @@ export interface BetsForm {
     moneyline_home: number,
 }
 
-export interface Prediction {
-    winner_team: string,
-    total_score: number,
-    total_score_q1: number,
-    total_score_q2: number,
-    total_score_q3: number,
-    total_score_q4: number,
-    total_score_ot: number
+export interface WinnerTotalScorePrediction {
+  winner_team: string,
+  total_score: number
+}
+export interface WinnerTeamPrediction {
+  winner_team: number
+}
+export interface TotalScorePrediction {
+  total_score: number
+}
+export interface TotalScoreQ1Prediction {
+  total_score_q1: number
+}
+export interface TotalScoreQ2Prediction {
+  total_score_q2: number
+}
+export interface TotalScoreQ3Prediction {
+  total_score_q3: number
+}
+export interface TotalScoreQ4Prediction {
+  total_score_q4: number
+}
+export interface TotalScoreOTPrediction {
+  total_score_ot: number
 }

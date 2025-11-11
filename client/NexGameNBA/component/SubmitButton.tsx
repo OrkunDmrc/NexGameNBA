@@ -22,7 +22,7 @@ export default function SubmitButton({text, onPress}: SubmitButtonProps){
             shadowOpacity: 0.25,
             shadowRadius: 4,
             elevation: 8,
-            width: '100%',
+            marginHorizontal: 20,
             marginVertical: 10}}
             onPress={onPress}>
           <Text style={{color: colors.white, fontWeight: "bold", fontSize: 20}}>{text}</Text>

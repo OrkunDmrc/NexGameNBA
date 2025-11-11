@@ -3,6 +3,8 @@ import { Stack, useSegments } from "expo-router";
 import { Image, Text, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { colors } from "./utils";
+import { useEffect } from "react";
+import { request } from "@/api/client";
 
 export default function RootLayout() {
   const segments = useSegments(); 
@@ -13,6 +15,10 @@ export default function RootLayout() {
     prediction: 'Prediction',
     results: 'Results',
   };
+  useEffect(() => {
+    request.train.get().then(e => console.log("önce"));
+    console.log("sonra")
+  }, [])
   return (
     <SafeAreaProvider style={{paddingTop: 20, backgroundColor: colors.primaryColor}}>
       <View style={{flexDirection: "row", padding: 10, height: 100, justifyContent: "center", alignItems: "center"}}>

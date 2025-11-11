@@ -1,5 +1,5 @@
 import { request } from "@/api/client";
-import { Prediction } from "@/api/objects";
+import { WinnerTotalScorePrediction } from "@/api/objects";
 import AwayHome from "@/component/AwayHome";
 import BaseTextInput from "@/component/BaseTextInput";
 import Line from "@/component/Line";
@@ -82,7 +82,7 @@ export default function Bets() {
     const moneylineAwayNum = Number(moneylineAway);
     const moneylineHomeNum = Number(moneylineHome);
     setIsLoading(() => true);
-    const res = await request.train.getTotalWinnerPredicts({
+    const res = await request.train.getTotalWinnerPred({
       regular: params.postseason === false,
       playoffs: params.postseason === true,
       away: params.away,
@@ -93,18 +93,17 @@ export default function Bets() {
       moneyline_home: americanToDecimal(moneylineHomeNum)
     });
     if(res.status === 200){
-      const prediction = res.data as Prediction
+      const prediction = res.data as WinnerTotalScorePrediction
       setIsLoading(() => false);
       router.push({
         pathname: "/prediction",
         params: {
           winnerTeam: prediction.winner_team,
           totalScore: prediction.total_score,
-          totalScoreq1: prediction.total_score_q1,
-          totalScoreq2: prediction.total_score_q2,
-          totalScoreq3: prediction.total_score_q3,
-          totalScoreq4: prediction.total_score_q4,
-          totalScoreOt: prediction.total_score_ot,
+          away: params.away,
+          home: params.home,
+          regular: (params.postseason === false).toString(),
+          playoffs: (params.postseason === true).toString(),
           total: total,
           spread: spread,
           moneylineAway: moneylineAway,

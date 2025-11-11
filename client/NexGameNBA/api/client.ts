@@ -2,16 +2,17 @@
 import { toast } from "@/component/toast";
 import axios, { AxiosError } from "axios";
 import { BetsForm } from "./objects";
-const apiKeys = require("../config.json");
+const configs = require("../config.json");
 
 //axios.defaults.withCredentials = true;
 
+const baseURL = configs["workmode"] === "dev" ? configs["devURL"] : configs["prodURL"];
 axios.interceptors.request.use(request => {
   request.headers["Content-Type"] = "application/json";
   if(request.url?.includes("balldontlie")){
-    request.headers["Authorization"] = apiKeys["balldontlie-API-Key"];
+    request.headers["Authorization"] = configs["balldontlie-API-Key"];
   }else{
-    request.headers["Authorization"] = apiKeys["service-API-key"];
+    request.headers["Authorization"] = configs["service-API-key"];
   }
   return request;
 });
@@ -62,13 +63,21 @@ const methods = {
   delete: (url: string) => axios.delete(url).then(res => res).catch(e => e),
 };
 
+
 const balldontlie = {
   getGamesByDate: async (date: string) => await methods.get(`https://api.balldontlie.io/v1/games?dates[]=${date}`)
 }
 
 const train = {
-  get:  async () => await methods.get("http://127.0.0.1:8000"),
-  getTotalWinnerPredicts: async (data: BetsForm) => await methods.post("http://127.0.0.1:8000/get_all_prediction", data)
+  get: async () => await methods.get(baseURL),
+  getTotalWinnerPred: async (data: BetsForm) => await methods.post(`${baseURL}/get_total_winner_prediction`, data),
+  getWinnerPred: async (data: BetsForm) => await methods.post(`${baseURL}/get_winner_prediction`, data),
+  getTotalScorePred: async (data: BetsForm) => await methods.post(`${baseURL}/get_total_score_prediction`, data),
+  getTotalScoreQ1Pred: async (data: BetsForm) => await methods.post(`${baseURL}/get_total_score_q1_prediction`, data),
+  getTotalScoreQ2Pred: async (data: BetsForm) => await methods.post(`${baseURL}/get_total_score_q2_prediction`, data),
+  getTotalScoreQ3Pred: async (data: BetsForm) => await methods.post(`${baseURL}/get_total_score_q3_prediction`, data),
+  getTotalScoreQ4Pred: async (data: BetsForm) => await methods.post(`${baseURL}/get_total_score_q4_prediction`, data),
+  getTotalScoreOTPred: async (data: BetsForm) => await methods.post(`${baseURL}/get_total_score_ot_prediction`, data)
 }
 
 export const request = {
