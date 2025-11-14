@@ -1,12 +1,19 @@
+import { request } from "@/api/client";
 import { DateProvider } from "@/contexts/DateContext";
 import { Stack, useSegments } from "expo-router";
+import { useEffect } from "react";
 import { Image, Text, View } from "react-native";
+import mobileAds, { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { colors } from "./utils";
-import { useEffect } from "react";
-import { request } from "@/api/client";
+
+
+mobileAds().initialize().then((adapterStatuses) => { /*innitialization complete*/ });
+
+const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-5726946755878714/3394649247';
 
 export default function RootLayout() {
+  //const bannerRef = useRef<BannerAd>(null);
   const segments = useSegments(); 
   const currentPage = segments.join('/');
   const pageTitles: { [key: string]: string } = {
@@ -41,6 +48,17 @@ export default function RootLayout() {
           <Stack.Screen name="results" options={{headerShown: false}}/>
         </Stack>
       </DateProvider>
+      <View style={{ alignItems: "center", backgroundColor: 'white' }}>
+        <BannerAd
+          unitId={adUnitId}
+          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+          requestOptions={{
+            requestNonPersonalizedAdsOnly: true,
+          }}
+          onAdFailedToLoad={(error) => console.log('Banner failed to load:', error)}
+          onAdLoaded={() => console.log('Banner loaded successfully')}
+        />
+      </View>
     </SafeAreaProvider>
   );
   
