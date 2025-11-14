@@ -11,11 +11,11 @@ import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { colors } from "./utils";
 
 export default function Index() {
-  const context = useContext(DateContext);
-  if (!context) {
-      throw new Error('DateDisplay must be used within a DateProvider');
+  const dateContext = useContext(DateContext);
+  if (!dateContext) {
+      throw new Error('DateDisplay');
   }
-  const { selectedDate, setSelectedDate } = context;
+  const { selectedDate, setSelectedDate } = dateContext;
   const [matches, setMaches] = useState<Array<Game>>();
   const [isLoading, setLoading] = useState<boolean>(true);
   async function getGamesByDate(date: string){
@@ -63,7 +63,7 @@ export default function Index() {
       <View style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
         <ActivityIndicator size="large" color={colors.white}/>
       </View>
-      :<ScrollView style={{width: "100%", marginBottom: 50}}>
+      :<ScrollView style={{width: "100%", marginBottom: 0}}>
         {matches?.map((match) => (
           <RouteButton key={match.id}
             awayTeam={match.visitor_team?.name || ""} 

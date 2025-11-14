@@ -4,9 +4,10 @@ import AwayHome from "@/component/AwayHome";
 import BaseTextInput from "@/component/BaseTextInput";
 import Line from "@/component/Line";
 import SubmitButton from "@/component/SubmitButton";
+import { ConnectionContext } from "@/contexts/ConnectionContext";
 import { router } from "expo-router";
 import { useSearchParams } from "expo-router/build/hooks";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ActivityIndicator, Keyboard, ScrollView, View } from "react-native";
 import { colors } from "./utils";
 
@@ -27,7 +28,11 @@ export default function Bets() {
   const [moneylineHome, setMoneylineHome] = useState<string>("");
   const [moneylineHomeError, setMoneylineHomeError] = useState<string>("");
   const [keyboardHeight, setKeyboardHeight] = useState(0);
-
+  const connectionContext = useContext(ConnectionContext);
+  if(!connectionContext){
+      throw new Error("Connection error");
+  }
+  const {setIsConnected} = connectionContext;
   useEffect(() => {
     const showSubscription = Keyboard.addListener('keyboardDidShow', (e) => {
       setKeyboardHeight(e.endCoordinates.height);
@@ -93,6 +98,7 @@ export default function Bets() {
       moneyline_home: americanToDecimal(moneylineHomeNum)
     });
     if(res.status === 200){
+      setIsConnected(true);
       const prediction = res.data as WinnerTotalScorePrediction
       setIsLoading(() => false);
       router.push({
@@ -109,7 +115,9 @@ export default function Bets() {
           moneylineAway: moneylineAway,
           moneylineHome: moneylineHome
         }
-      })
+      });
+    }else{
+      setIsConnected(false);
     }
     setIsLoading(() => false);
   }
@@ -125,13 +133,13 @@ export default function Bets() {
     >
       <AwayHome away={params.away} home={params.home}/>
       <Line />
-      <ScrollView style={{width: "100%", marginBottom: keyboardHeight ? keyboardHeight : 50}}>
+      <ScrollView style={{width: "100%", marginBottom: keyboardHeight ? keyboardHeight : 0}}>
         <BaseTextInput value={spread} onChange={(e) => setSpread(e.nativeEvent.text)} text="Spread" errorText={spreadError} maxLength={2}/>
         <BaseTextInput value={total} onChange={(e) => setTotal(e.nativeEvent.text)} text="Total" errorText={totalError} maxLength={5}/>
         <BaseTextInput value={moneylineAway} onChange={(e) => setMoneylineAway(e.nativeEvent.text)} text="Moneyline Away" errorText={moneylineAwayError} maxLength={5}/>
         <BaseTextInput value={moneylineHome} onChange={(e) => setMoneylineHome(e.nativeEvent.text)} text="Moneyline Home" errorText={moneylineHomeError} maxLength={5}/>
         {isLoading ?
-        <View style={{alignItems: "center", justifyContent: "center", margin:10 }}>
+        <View style={{alignItems: "center", justifyContent: "center", margin: 4 }}>
             <ActivityIndicator size="large" color={colors.white}/>
         </View>
         : <SubmitButton text="PREDICT" onPress={submit}/>}

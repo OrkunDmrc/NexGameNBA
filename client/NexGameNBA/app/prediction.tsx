@@ -1,12 +1,13 @@
+import { request } from "@/api/client";
+import { BetsForm, TotalScoreOTPrediction, TotalScoreQ1Prediction, TotalScoreQ2Prediction, TotalScoreQ3Prediction, TotalScoreQ4Prediction } from "@/api/objects";
 import BaseTextInput from "@/component/BaseTextInput";
 import Line from "@/component/Line";
+import SubmitButton from "@/component/SubmitButton";
+import { ConnectionContext } from "@/contexts/ConnectionContext";
 import { useSearchParams } from "expo-router/build/hooks";
+import { useContext, useState } from "react";
 import { ActivityIndicator, Image, ScrollView, Text, View } from "react-native";
 import { colors, getLogo } from "./utils";
-import { useState } from "react";
-import { request } from "@/api/client";
-import { BetsForm, TotalScoreQ1Prediction, TotalScoreQ2Prediction, TotalScoreQ3Prediction, TotalScoreQ4Prediction, TotalScoreOTPrediction } from "@/api/objects";
-import SubmitButton from "@/component/SubmitButton";
 
 export default function Prediction() {
   const [winnerTeam,
@@ -48,6 +49,11 @@ export default function Prediction() {
   const [totalScoreq3, setTotalScoreq3] = useState<number>(-1);
   const [totalScoreq4, setTotalScoreq4] = useState<number>(-1);
   const [totalScoreOt, setTotalScoreot] = useState<number>(-1);
+  const connectionContext = useContext(ConnectionContext);
+  if(!connectionContext){
+      throw new Error("Connection error");
+  }
+  const {setIsConnected} = connectionContext;
   const isHomeWinner = params.winnerTeam === params.home;
   const chanceToWin = isHomeWinner ? 1 / params.moneylineHome : 1 / params.moneylineAway;
   const winnerTeamRisk = {
@@ -64,7 +70,7 @@ export default function Prediction() {
     text: totalScoreOt < 11 ? "(Low Risk)" : totalScoreOt < 20 ? "(Medium Risk)" : "(High Risk)",
     color: totalScoreOt < 11 ? colors.green : totalScoreOt < 20 ? colors.yellow : colors.secondaryColor,
   }
-  function getQuarterPred(quarter: number){
+  async function getQuarterPred(quarter: number){
     setIsLoading(() => true);
     const reqItem : BetsForm = {
       regular: params.regular,
@@ -78,65 +84,61 @@ export default function Prediction() {
     }
     switch(quarter){
       case 1:
-        request.train.getTotalScoreQ1Pred(reqItem)
-        .then(res => {
-          if(res.status === 200){
-            const data = res.data as TotalScoreQ1Prediction
-            setTotalScoreq1(() => data.total_score_q1);
-            setIsLoading(() => false);
-            if(totalScoreh1 < 0 && data.total_score_q1 > 0 && totalScoreq2 > 0) setTotalScoreh1(() => data.total_score_q1 + totalScoreq2);
-          }
-        }).catch(e => setIsLoading(() => false));
+        var res = await request.train.getTotalScoreQ1Pred(reqItem)
+        if(res.status === 200){
+          const data = res.data as TotalScoreQ1Prediction
+          setTotalScoreq1(() => data.total_score_q1);
+          setIsLoading(() => false);
+          if(totalScoreh1 < 0 && data.total_score_q1 > 0 && totalScoreq2 > 0) setTotalScoreh1(() => data.total_score_q1 + totalScoreq2);
+        }else{
+          setIsConnected(false);
+        }
         break;
       case 2:
-        request.train.getTotalScoreQ2Pred(reqItem)
-        .then(res => {
-          if(res.status === 200){
-            const data = res.data as TotalScoreQ2Prediction
-            setTotalScoreq2(() => data.total_score_q2);
-            setIsLoading(() => false);
-            if(totalScoreh1 < 0 && totalScoreq1 > 0 && data.total_score_q2 > 0) setTotalScoreh1(() => totalScoreq1 + data.total_score_q2);
-          }
-        }).catch(e => setIsLoading(() => false));;
+        var res = await request.train.getTotalScoreQ2Pred(reqItem);
+        if(res.status === 200){
+          const data = res.data as TotalScoreQ2Prediction
+          setTotalScoreq2(() => data.total_score_q2);
+          setIsLoading(() => false);
+          if(totalScoreh1 < 0 && totalScoreq1 > 0 && data.total_score_q2 > 0) setTotalScoreh1(() => totalScoreq1 + data.total_score_q2);
+        }else{
+          setIsConnected(false);
+        }
         break;
       case 3:
-        request.train.getTotalScoreQ3Pred(reqItem)
-        .then(res => {
-          if(res.status === 200){
-            const data = res.data as TotalScoreQ3Prediction
-            setTotalScoreq3(() => data.total_score_q3);
-            setIsLoading(() => false);
-            if(totalScoreh2 < 0 && data.total_score_q3 > 0 && totalScoreq4 > 0) setTotalScoreh2(() => data.total_score_q3 + totalScoreq4);
-          }
-        });
+        var res = await request.train.getTotalScoreQ3Pred(reqItem);
+        if(res.status === 200){
+          const data = res.data as TotalScoreQ3Prediction
+          setTotalScoreq3(() => data.total_score_q3);
+          setIsLoading(() => false);
+          if(totalScoreh2 < 0 && data.total_score_q3 > 0 && totalScoreq4 > 0) setTotalScoreh2(() => data.total_score_q3 + totalScoreq4);
+        }else{
+          setIsConnected(false);
+        }
         break;
       case 4:
-        request.train.getTotalScoreQ4Pred(reqItem)
-        .then(res => {
-          if(res.status === 200){
-            const data = res.data as TotalScoreQ4Prediction
-            setTotalScoreq4(() => data.total_score_q4);
-            setIsLoading(() => false);
-            if(totalScoreh2 < 0 && totalScoreq3 > 0 && data.total_score_q4 > 0) setTotalScoreh2(() => totalScoreq3 + data.total_score_q4);
-          }
-        }).catch(e => setIsLoading(() => false));;
+        var res = await request.train.getTotalScoreQ4Pred(reqItem);
+        if(res.status === 200){
+          const data = res.data as TotalScoreQ4Prediction
+          setTotalScoreq4(() => data.total_score_q4);
+          setIsLoading(() => false);
+          if(totalScoreh2 < 0 && totalScoreq3 > 0 && data.total_score_q4 > 0) setTotalScoreh2(() => totalScoreq3 + data.total_score_q4);
+        }else{
+          setIsConnected(false);
+        }
         break;
       default:
-        request.train.getTotalScoreOTPred(reqItem)
-        .then(res => {
-          if(res.status === 200){
-            const data = res.data as TotalScoreOTPrediction
-            setTotalScoreot(() => data.total_score_ot);
-            setIsLoading(() => false);
-          }
-        }).catch(e => setIsLoading(() => false));
+        var res = await request.train.getTotalScoreOTPred(reqItem);
+        if(res.status === 200){
+          const data = res.data as TotalScoreOTPrediction
+          setTotalScoreot(() => data.total_score_ot);
+          setIsLoading(() => false);
+        }else{
+          setIsConnected(false);
+        }
         break;
-    }    
-  }
-  function halfTimeScoreChecks(){
-    if(totalScoreq1 > 0 && totalScoreq2 > 0 && totalScoreh1 < 0)
-      setTotalScoreh1(() => totalScoreq1 + totalScoreq2);
-    if(totalScoreq3 > 0 && totalScoreq4 > 0 && totalScoreh2 < 0) setTotalScoreh2(() => totalScoreq3 + totalScoreq4);
+    }
+    setIsLoading(() => false);
   }
   return (
     <View
@@ -166,7 +168,7 @@ export default function Prediction() {
         <Text style={{color: colors.white, fontWeight: "bold", fontSize: 20}}>{params.winnerTeam}</Text>
       </View>
       <Line/>
-      <ScrollView style={{width: "100%", marginBottom: 50}}>
+      <ScrollView style={{width: "100%", marginBottom: 0}}>
         <BaseTextInput 
           value={`${params.totalScore} (${params.totalScore > params.total ? "Under" : "Over"})`} 
           text={`Total Score ${totalScoreRisk.text}`} 
@@ -184,11 +186,13 @@ export default function Prediction() {
               <ActivityIndicator size="large" color={colors.white}/>
           </View>
         : <SubmitButton text={"Click to See 1st Quarter"} onPress={() => getQuarterPred(1)}/>
-        : <BaseTextInput
-            value={totalScoreq1.toString()} 
-            text="1st Quarter Total Score (High Risk)"
-            backgroundColor={colors.secondaryColor}
-            editable={false}/>
+        : <View style={{paddingHorizontal: 20}}>
+            <BaseTextInput
+              value={totalScoreq1.toString()} 
+              text="1st Quarter Total Score (High Risk)"
+              backgroundColor={colors.secondaryColor}
+              editable={false}/>
+          </View>
         }
         {totalScoreq2 < 0 ? 
         isLoading ? 
@@ -196,11 +200,13 @@ export default function Prediction() {
               <ActivityIndicator size="large" color={colors.white}/>
           </View>
         : <SubmitButton text={"Click to See 2nd Quarter"} onPress={() => getQuarterPred(2)}/>
-        : <BaseTextInput
-            value={totalScoreq2.toString()} 
-            text="2nd Quarter Total Score (High Risk)"
-            backgroundColor={colors.secondaryColor}
-            editable={false}/>
+        : <View style={{paddingHorizontal: 20}}>
+            <BaseTextInput
+                value={totalScoreq2.toString()} 
+                text="2nd Quarter Total Score (High Risk)"
+                backgroundColor={colors.secondaryColor}
+                editable={false}/>
+          </View>
         }
         <BaseTextInput
           value={totalScoreh2 < 0 ? totalScoreh2Text : totalScoreh2.toString()}
@@ -214,11 +220,13 @@ export default function Prediction() {
               <ActivityIndicator size="large" color={colors.white}/>
           </View>
         : <SubmitButton text={"Click to See 3rd Quarter"} onPress={() => getQuarterPred(3)}/>
-        : <BaseTextInput
-            value={totalScoreq3.toString()} 
-            text="3rd Quarter Total Score (High Risk)"
-            backgroundColor={colors.secondaryColor}
-            editable={false}/>
+        : <View style={{paddingHorizontal: 20}}>
+            <BaseTextInput
+                value={totalScoreq3.toString()} 
+                text="3rd Quarter Total Score (High Risk)"
+                backgroundColor={colors.secondaryColor}
+                editable={false}/>
+          </View>
         }
         {totalScoreq4 < 0 ? 
         isLoading ? 
@@ -226,11 +234,13 @@ export default function Prediction() {
               <ActivityIndicator size="large" color={colors.white}/>
           </View>
         : <SubmitButton text={"Click to See 4th Quarter"} onPress={() => getQuarterPred(4)}/>
-        : <BaseTextInput
-            value={totalScoreq4.toString()} 
-            text="4th Quarter Total Score (High Risk)"
-            backgroundColor={colors.secondaryColor}
-            editable={false}/>
+        : <View style={{paddingHorizontal: 20}}>
+            <BaseTextInput
+                value={totalScoreq4.toString()} 
+                text="4th Quarter Total Score (High Risk)"
+                backgroundColor={colors.secondaryColor}
+                editable={false}/>
+          </View>
         }
         {totalScoreOt < 0 ? 
         isLoading ? 
@@ -238,10 +248,12 @@ export default function Prediction() {
               <ActivityIndicator size="large" color={colors.white}/>
           </View>
         : <SubmitButton text={"Click to See Over Time"} onPress={() => getQuarterPred(0)}/>
-        : <BaseTextInput 
-            value={totalScoreOt < 11 ? "0" : totalScoreOt.toString()} 
-            text={`Over Time Total Score ${totalScoreOtRisk.text}`}  
-            backgroundColor={totalScoreOtRisk.color} />
+        : <View style={{paddingHorizontal: 20}}>
+            <BaseTextInput 
+                value={totalScoreOt < 11 ? "0" : totalScoreOt.toString()} 
+                text={`Over Time Total Score ${totalScoreOtRisk.text}`}  
+                backgroundColor={totalScoreOtRisk.color} />
+          </View>
         }
       </ScrollView>
     </View>

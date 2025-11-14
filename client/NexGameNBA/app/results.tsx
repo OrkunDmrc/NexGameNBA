@@ -71,7 +71,7 @@ export default function Results() {
         <Text style={{fontWeight: "bold", color: colors.white}}>Home</Text>
       </View>
       <Line/>
-      <ScrollView style={{width: "100%", marginBottom: 50}}>
+      <ScrollView style={{width: "100%", marginBottom: 0}}>
         <ResultContainer
           text={"Score"}
           away={params.away}

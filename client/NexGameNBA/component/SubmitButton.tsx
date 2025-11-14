@@ -17,15 +17,15 @@ export default function SubmitButton({text, onPress}: SubmitButtonProps){
             borderColor: colors.white,
             borderWidth: 2,
             paddingVertical: 5,
-            borderRadius: 20,
-            shadowOffset: { width: 0, height: 4 },
+            borderRadius: 10,
+            shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.25,
             shadowRadius: 4,
             elevation: 8,
-            marginHorizontal: 20,
+            //marginHorizontal: 20,
             marginVertical: 10}}
             onPress={onPress}>
-          <Text style={{color: colors.white, fontWeight: "bold", fontSize: 20}}>{text}</Text>
+          <Text style={{color: colors.white, fontWeight: "bold", fontSize: 15}}>{text}</Text>
         </TouchableOpacity>
     );
 }
