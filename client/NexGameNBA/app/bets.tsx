@@ -5,13 +5,53 @@ import BaseTextInput from "@/component/BaseTextInput";
 import Line from "@/component/Line";
 import SubmitButton from "@/component/SubmitButton";
 import { ConnectionContext } from "@/contexts/ConnectionContext";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useSearchParams } from "expo-router/build/hooks";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { ActivityIndicator, Keyboard, ScrollView, View } from "react-native";
-import { colors } from "./utils";
+import { adIds, colors } from "./utils";
+import { AdEventType, RewardedAd, RewardedAdEventType, RewardedInterstitialAd, TestIds } from "react-native-google-mobile-ads";
+
+const adUnitId = adIds.rewardedAdId;
+const rewarded = RewardedAd.createForAdRequest(adUnitId, {
+  keywords: ['fashion', 'clothing'],
+});
 
 export default function Bets() {
+  const [adLoaded, setAdLoaded] = useState<boolean>(false);
+  useFocusEffect(
+    useCallback(() => {
+      const unsubscribeLoaded = rewarded.addAdEventListener(
+        RewardedAdEventType.LOADED,
+        () => {
+          setAdLoaded(true);
+          console.log("Rewarded loaded successfully");
+        },
+      );
+      const unsubscribeEarned = rewarded.addAdEventListener(
+        RewardedAdEventType.EARNED_REWARD,
+        reward => {
+          setAdLoaded(false);
+          console.log('User earned reward of ', reward);
+        },
+      );
+      const unsubscribeError = rewarded.addAdEventListener(
+        AdEventType.ERROR,
+        (error) => {
+          console.log("Rewarded ERROR:", error);
+          setIsLoading(() => false);
+        }
+      );
+      console.log("Rewarded loading...");
+      rewarded.load();
+      return () => {
+        unsubscribeLoaded();
+        unsubscribeEarned();
+        unsubscribeError();
+      };
+    }, [])
+  );
+
   const [away, home, postSeason] = useSearchParams();
   const params = {
     away: away[1],
@@ -84,10 +124,10 @@ export default function Bets() {
       setMoneylineHomeError("This field must be number.");
       return;
     }
+    setIsLoading(() => true);
     const moneylineAwayNum = Number(moneylineAway);
     const moneylineHomeNum = Number(moneylineHome);
-    setIsLoading(() => true);
-    const res = await request.train.getTotalWinnerPred({
+    request.train.getTotalWinnerPred({
       regular: params.postseason === false,
       playoffs: params.postseason === true,
       away: params.away,
@@ -96,30 +136,32 @@ export default function Bets() {
       total: Number(total.replace(",",".")),
       moneyline_away: americanToDecimal(moneylineAwayNum),
       moneyline_home: americanToDecimal(moneylineHomeNum)
-    });
-    if(res.status === 200){
-      setIsConnected(true);
-      const prediction = res.data as WinnerTotalScorePrediction
+    }).then(res => {
+      if(res.status === 200){
+        setIsConnected(true);
+        const prediction = res.data as WinnerTotalScorePrediction
+        setIsLoading(() => false);
+        router.push({
+          pathname: "/prediction",
+          params: {
+            winnerTeam: prediction.winner_team,
+            totalScore: prediction.total_score,
+            away: params.away,
+            home: params.home,
+            regular: (params.postseason === false).toString(),
+            playoffs: (params.postseason === true).toString(),
+            total: total,
+            spread: spread,
+            moneylineAway: moneylineAway,
+            moneylineHome: moneylineHome
+          }
+        });
+      }else{
+        setIsConnected(false);
+      }
       setIsLoading(() => false);
-      router.push({
-        pathname: "/prediction",
-        params: {
-          winnerTeam: prediction.winner_team,
-          totalScore: prediction.total_score,
-          away: params.away,
-          home: params.home,
-          regular: (params.postseason === false).toString(),
-          playoffs: (params.postseason === true).toString(),
-          total: total,
-          spread: spread,
-          moneylineAway: moneylineAway,
-          moneylineHome: moneylineHome
-        }
-      });
-    }else{
-      setIsConnected(false);
-    }
-    setIsLoading(() => false);
+    });
+    rewarded.show();
   }
   return (
     <View
@@ -142,7 +184,7 @@ export default function Bets() {
         <View style={{alignItems: "center", justifyContent: "center", margin: 4 }}>
             <ActivityIndicator size="large" color={colors.white}/>
         </View>
-        : <SubmitButton text="PREDICT" onPress={submit}/>}
+        : <SubmitButton text={adLoaded ? "PREDICT" : "Loading..."} onPress={submit} disabled={!adLoaded}/>}
       </ScrollView>
     </View>
   );

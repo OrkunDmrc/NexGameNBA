@@ -5,11 +5,53 @@ import Line from "@/component/Line";
 import SubmitButton from "@/component/SubmitButton";
 import { ConnectionContext } from "@/contexts/ConnectionContext";
 import { useSearchParams } from "expo-router/build/hooks";
-import { useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { ActivityIndicator, Image, ScrollView, Text, View } from "react-native";
-import { colors, getLogo } from "./utils";
+import { adIds, colors, getLogo } from "./utils";
+import { AdEventType, RewardedAdEventType, RewardedInterstitialAd, TestIds } from "react-native-google-mobile-ads";
+import { useFocusEffect } from "@react-navigation/native";
+
+const adUnitId = adIds.rewardedIntAdId;
+
+const rewardedInterstitial = RewardedInterstitialAd.createForAdRequest(adUnitId, {
+  keywords: ['fashion', 'clothing'],
+});
+
 
 export default function Prediction() {
+  const [adLoaded, setAdLoaded] = useState<boolean>(true);
+  /*useEffect(() => {
+    const unsubscribeLoaded = rewardedInterstitial.addAdEventListener(
+      RewardedAdEventType.LOADED,
+      () => {
+        //setAdLoaded(true);
+        console.log("Rewarded Interstitial loaded successfully");
+      },
+    );
+    const unsubscribeEarned = rewardedInterstitial.addAdEventListener(
+      RewardedAdEventType.EARNED_REWARD,
+      reward => {
+        //setAdLoaded(false);
+        console.log('User earned reward of ', reward);
+        console.log("Rewarded Interstitial loading...");
+        rewardedInterstitial.load();
+      },
+    );
+    const unsubscribeError = rewardedInterstitial.addAdEventListener(
+      AdEventType.ERROR,
+      (error) => {
+        console.log("Rewarded Interstitial ERROR:", error);
+        setIsLoading(() => false);
+      }
+    );
+    console.log("Rewarded Interstitial loading...");
+    rewardedInterstitial.load();
+    return () => {
+      unsubscribeLoaded();
+      unsubscribeEarned();
+      unsubscribeError();
+    };
+  }, []);*/
   const [winnerTeam,
     totalScore,
     away,
@@ -82,63 +124,81 @@ export default function Prediction() {
       moneyline_away: params.moneylineAway,
       moneyline_home: params.moneylineHome
     }
-    switch(quarter){
-      case 1:
-        var res = await request.train.getTotalScoreQ1Pred(reqItem)
-        if(res.status === 200){
-          const data = res.data as TotalScoreQ1Prediction
-          setTotalScoreq1(() => data.total_score_q1);
-          setIsLoading(() => false);
-          if(totalScoreh1 < 0 && data.total_score_q1 > 0 && totalScoreq2 > 0) setTotalScoreh1(() => data.total_score_q1 + totalScoreq2);
-        }else{
-          setIsConnected(false);
-        }
-        break;
-      case 2:
-        var res = await request.train.getTotalScoreQ2Pred(reqItem);
-        if(res.status === 200){
-          const data = res.data as TotalScoreQ2Prediction
-          setTotalScoreq2(() => data.total_score_q2);
-          setIsLoading(() => false);
-          if(totalScoreh1 < 0 && totalScoreq1 > 0 && data.total_score_q2 > 0) setTotalScoreh1(() => totalScoreq1 + data.total_score_q2);
-        }else{
-          setIsConnected(false);
-        }
-        break;
-      case 3:
-        var res = await request.train.getTotalScoreQ3Pred(reqItem);
-        if(res.status === 200){
-          const data = res.data as TotalScoreQ3Prediction
-          setTotalScoreq3(() => data.total_score_q3);
-          setIsLoading(() => false);
-          if(totalScoreh2 < 0 && data.total_score_q3 > 0 && totalScoreq4 > 0) setTotalScoreh2(() => data.total_score_q3 + totalScoreq4);
-        }else{
-          setIsConnected(false);
-        }
-        break;
-      case 4:
-        var res = await request.train.getTotalScoreQ4Pred(reqItem);
-        if(res.status === 200){
-          const data = res.data as TotalScoreQ4Prediction
-          setTotalScoreq4(() => data.total_score_q4);
-          setIsLoading(() => false);
-          if(totalScoreh2 < 0 && totalScoreq3 > 0 && data.total_score_q4 > 0) setTotalScoreh2(() => totalScoreq3 + data.total_score_q4);
-        }else{
-          setIsConnected(false);
-        }
-        break;
-      default:
-        var res = await request.train.getTotalScoreOTPred(reqItem);
-        if(res.status === 200){
-          const data = res.data as TotalScoreOTPrediction
-          setTotalScoreot(() => data.total_score_ot);
-          setIsLoading(() => false);
-        }else{
-          setIsConnected(false);
-        }
-        break;
+    try{
+      switch(quarter){
+        case 1:
+          request.train.getTotalScoreQ1Pred(reqItem)
+          .then(res => {
+            if(res.status === 200){
+              const data = res.data as TotalScoreQ1Prediction
+              setTotalScoreq1(() => data.total_score_q1);
+              if(totalScoreh1 < 0 && data.total_score_q1 > 0 && totalScoreq2 > 0) setTotalScoreh1(() => data.total_score_q1 + totalScoreq2);
+            }else{
+              setIsConnected(false);
+            }
+            //rewardedInterstitial.show();
+            setIsLoading(() => false);
+          });
+          break;
+        case 2:
+          request.train.getTotalScoreQ2Pred(reqItem)
+          .then(res => {
+            if(res.status === 200){
+              const data = res.data as TotalScoreQ2Prediction
+              setTotalScoreq2(() => data.total_score_q2);
+              if(totalScoreh1 < 0 && totalScoreq1 > 0 && data.total_score_q2 > 0) setTotalScoreh1(() => totalScoreq1 + data.total_score_q2);
+            }else{
+              setIsConnected(false);
+            }
+            //rewardedInterstitial.show();
+            setIsLoading(() => false);
+          });
+          break;
+        case 3:
+          request.train.getTotalScoreQ3Pred(reqItem)
+          .then(res => {
+            if(res.status === 200){
+              const data = res.data as TotalScoreQ3Prediction
+              setTotalScoreq3(() => data.total_score_q3);
+              if(totalScoreh2 < 0 && data.total_score_q3 > 0 && totalScoreq4 > 0) setTotalScoreh2(() => data.total_score_q3 + totalScoreq4);
+            }else{
+              setIsConnected(false);
+            }
+            //rewardedInterstitial.show();
+            setIsLoading(() => false);
+          });
+          break;
+        case 4:
+          var res = await request.train.getTotalScoreQ4Pred(reqItem)
+          .then(res => {
+            if(res.status === 200){
+              const data = res.data as TotalScoreQ4Prediction
+              setTotalScoreq4(() => data.total_score_q4);
+              if(totalScoreh2 < 0 && totalScoreq3 > 0 && data.total_score_q4 > 0) setTotalScoreh2(() => totalScoreq3 + data.total_score_q4);
+            }else{
+              setIsConnected(false);
+            }
+            //rewardedInterstitial.show();
+            setIsLoading(() => false);
+          });
+          break;
+        default:
+          request.train.getTotalScoreOTPred(reqItem)
+          .then(res => {
+            if(res.status === 200){
+              const data = res.data as TotalScoreOTPrediction
+              setTotalScoreot(() => data.total_score_ot);
+            }else{
+              setIsConnected(false);
+            }
+            //rewardedInterstitial.show();
+            setIsLoading(() => false);
+          });
+          break;
+      }
+    }catch{
+      setIsLoading(() => false);
     }
-    setIsLoading(() => false);
   }
   return (
     <View
@@ -176,16 +236,16 @@ export default function Prediction() {
           editable={false}/>
         <BaseTextInput
           value={totalScoreh1 < 0 ? totalScoreh1Text : totalScoreh1.toString()} 
-          text="1st Half Total Score (Medium Risk)"  
+          text="1st Half Total Score Comming Soon"  //(Medium Risk)
           backgroundColor={colors.yellow} 
           editable={false}
           />
-        {totalScoreq1 < 0 ? 
+        {/*totalScoreq1 < 0 ? 
         isLoading ? 
           <View style={{alignItems: "center", justifyContent: "center", margin:10 }}>
               <ActivityIndicator size="large" color={colors.white}/>
           </View>
-        : <SubmitButton text={"Click to See 1st Quarter"} onPress={() => getQuarterPred(1)}/>
+        : <SubmitButton text={adLoaded ? "Click to See 1st Quarter" : "Loading..."} onPress={() => getQuarterPred(1)} disabled={!adLoaded}/>
         : <View style={{paddingHorizontal: 20}}>
             <BaseTextInput
               value={totalScoreq1.toString()} 
@@ -193,13 +253,13 @@ export default function Prediction() {
               backgroundColor={colors.secondaryColor}
               editable={false}/>
           </View>
-        }
-        {totalScoreq2 < 0 ? 
+        */}
+        {/*totalScoreq2 < 0 ? 
         isLoading ? 
           <View style={{alignItems: "center", justifyContent: "center", margin:10 }}>
               <ActivityIndicator size="large" color={colors.white}/>
           </View>
-        : <SubmitButton text={"Click to See 2nd Quarter"} onPress={() => getQuarterPred(2)}/>
+        : <SubmitButton text={adLoaded ? "Click to See 2nd Quarter" : "Loading..."} onPress={() => getQuarterPred(2)} disabled={!adLoaded}/>
         : <View style={{paddingHorizontal: 20}}>
             <BaseTextInput
                 value={totalScoreq2.toString()} 
@@ -207,19 +267,19 @@ export default function Prediction() {
                 backgroundColor={colors.secondaryColor}
                 editable={false}/>
           </View>
-        }
+        */}
         <BaseTextInput
           value={totalScoreh2 < 0 ? totalScoreh2Text : totalScoreh2.toString()}
-          text="2nd Half Total Score (Medium Risk)" 
+          text="2nd Half Total Score Comming Soon" //(Medium Risk)
           backgroundColor={colors.yellow} 
           editable={false}
           />
-        {totalScoreq3 < 0 ? 
+        {/*totalScoreq3 < 0 ? 
         isLoading ? 
           <View style={{alignItems: "center", justifyContent: "center", margin:10 }}>
               <ActivityIndicator size="large" color={colors.white}/>
           </View>
-        : <SubmitButton text={"Click to See 3rd Quarter"} onPress={() => getQuarterPred(3)}/>
+        : <SubmitButton text={adLoaded ? "Click to See 3rd Quarter" : "Loading..."} onPress={() => getQuarterPred(3)} disabled={!adLoaded}/>
         : <View style={{paddingHorizontal: 20}}>
             <BaseTextInput
                 value={totalScoreq3.toString()} 
@@ -227,13 +287,13 @@ export default function Prediction() {
                 backgroundColor={colors.secondaryColor}
                 editable={false}/>
           </View>
-        }
-        {totalScoreq4 < 0 ? 
+        */}
+        {/*totalScoreq4 < 0 ? 
         isLoading ? 
           <View style={{alignItems: "center", justifyContent: "center", margin:10 }}>
               <ActivityIndicator size="large" color={colors.white}/>
           </View>
-        : <SubmitButton text={"Click to See 4th Quarter"} onPress={() => getQuarterPred(4)}/>
+        : <SubmitButton text={adLoaded ? "Click to See 4th Quarter" : "Loading..."} onPress={() => getQuarterPred(4)} disabled={!adLoaded}/>
         : <View style={{paddingHorizontal: 20}}>
             <BaseTextInput
                 value={totalScoreq4.toString()} 
@@ -241,20 +301,20 @@ export default function Prediction() {
                 backgroundColor={colors.secondaryColor}
                 editable={false}/>
           </View>
-        }
-        {totalScoreOt < 0 ? 
+        */}
+        {/*totalScoreOt < 0 ? 
         isLoading ? 
           <View style={{alignItems: "center", justifyContent: "center", margin:10 }}>
               <ActivityIndicator size="large" color={colors.white}/>
           </View>
-        : <SubmitButton text={"Click to See Over Time"} onPress={() => getQuarterPred(0)}/>
+        : <SubmitButton text={adLoaded ? "Click to See Over Time" : "Loading..."} onPress={() => getQuarterPred(0)} disabled={!adLoaded}/>
         : <View style={{paddingHorizontal: 20}}>
             <BaseTextInput 
                 value={totalScoreOt < 11 ? "0" : totalScoreOt.toString()} 
                 text={`Over Time Total Score ${totalScoreOtRisk.text}`}  
                 backgroundColor={totalScoreOtRisk.color} />
           </View>
-        }
+        */}
       </ScrollView>
     </View>
   );

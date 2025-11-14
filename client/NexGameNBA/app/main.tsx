@@ -3,15 +3,13 @@ import { DateProvider } from "@/contexts/DateContext";
 import { Stack, useSegments } from "expo-router";
 import { useContext, useEffect } from "react";
 import { Image, Text, View } from "react-native";
-//import mobileAds, { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+import mobileAds, { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 import { ConnectionContext } from "@/contexts/ConnectionContext";
 import Constants from 'expo-constants';
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { colors } from "./utils";
+import { adIds, colors } from "./utils";
 
-//mobileAds().initialize().then((adapterStatuses) => { /*innitialization complete*/ });
-
-//const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER :  TestIds.ADAPTIVE_BANNER;
+const adUnitId = adIds.bannerAdId;
 
 export default function Main(){
     //const bannerRef = useRef<BannerAd>(null);
@@ -42,20 +40,20 @@ export default function Main(){
                 {isConnected ? "Server connected" : "Connecting to the server..."}
                 </Text>
             </View>
-            <View style={{flexDirection: "column", padding: 10, height: 95, justifyContent: "center", alignItems: "center"}}>
+            <View style={{flexDirection: "row", padding: 10, height: 95, justifyContent: "center", alignItems: "center"}}>
+                <Image
+                    source={require('../assets/images/nba.png')}
+                    style={{width: 40, height: 90, position:"absolute", left: 10}}
+                    resizeMode="contain"
+                />
                 <View>
-                <Text style={{color: "white", fontSize: 30, textAlign: "center", fontWeight: "bold"}}>
-                    {pageTitles[currentPage] || 'Nex Game\nNBA'}
-                </Text>
+                    <Text style={{color: "white", fontSize: 30, textAlign: "center", fontWeight: "bold"}}>
+                        {pageTitles[currentPage] || 'Nex Game\nNBA'}
+                    </Text>
                 </View>
             </View>
-            <Image
-                source={require('../assets/images/nba.png')}
-                style={{width: 40, height: 90, position:"absolute", top: 20, left: 10}}
-                resizeMode="contain"
-            />
             
-                <DateProvider>
+            <DateProvider>
                 <Stack>
                     <Stack.Screen name="index" options={{headerShown: false}}/>
                     <Stack.Screen name="bets" options={{headerShown: false}}/>
@@ -63,16 +61,16 @@ export default function Main(){
                     <Stack.Screen name="results" options={{headerShown: false}}/>
                 </Stack>
                 </DateProvider>
-            <View style={{ alignItems: "center", backgroundColor: colors.primaryColor, height: 50}}>
-                {/*<BannerAd
-                unitId={adUnitId}
-                size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-                requestOptions={{
-                    requestNonPersonalizedAdsOnly: true,
-                }}
-                onAdFailedToLoad={(error) => console.log('Banner failed to load:', error)}
-                onAdLoaded={() => console.log('Banner loaded successfully')}
-                />*/}
+            <View style={{ alignItems: "center", backgroundColor: colors.primaryColor, height: "auto"}}>
+                {<BannerAd
+                    unitId={adUnitId}
+                    size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+                    requestOptions={{
+                        requestNonPersonalizedAdsOnly: true,
+                    }}
+                    onAdFailedToLoad={(error) => console.log('Banner failed to load:', error)}
+                    onAdLoaded={() => console.log('Banner loaded successfully')}
+                />}
             </View>
         </SafeAreaProvider>
     );

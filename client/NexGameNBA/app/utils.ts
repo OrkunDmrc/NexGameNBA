@@ -1,3 +1,5 @@
+import { TestIds } from "react-native-google-mobile-ads";
+
 export const colors = {
     primaryColor: "#00438C",
     secondaryColor: "#C52B2F",
@@ -79,5 +81,15 @@ const getFullName = (name: string) =>  {
     'Memphis Grizzlies']
     return list.find((e) => e.includes(name))?.toString();
 } 
+
+const configs = require("../config.json");
+
+export const adIds = {
+  appOpenAdId: configs["workmode"] === "dev" ? TestIds.APP_OPEN : TestIds.APP_OPEN,
+  bannerAdId: configs["workmode"] === "dev" ? TestIds.ADAPTIVE_BANNER : configs["bannerUnitId"],
+  rewardedAdId: configs["workmode"] === "dev" ? TestIds.REWARDED : configs["rewardedUnitId"],
+  rewardedIntAdId: configs["workmode"] === "dev" ? TestIds.REWARDED_INTERSTITIAL : TestIds.REWARDED_INTERSTITIAL
+}
+
 
 //  //ssl.gstatic.com/onebox/media/sports/logos/_bgagBCd6ieOIt3INWRN_w_96x96.png
