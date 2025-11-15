@@ -35,7 +35,7 @@ export default function RouteButton({awayTeam, homeTeam, onPress, awayScore, hom
                     {awayTeam}
                 </Text>
                 <Image
-                    source={{uri: getLogo(awayTeam)}}
+                    source={getLogo(awayTeam)}
                     style={{width: 25, height: 25, marginLeft: 5}}
                     resizeMode="contain"
                 />
@@ -57,7 +57,7 @@ export default function RouteButton({awayTeam, homeTeam, onPress, awayScore, hom
             </View>
             <View style={{flexDirection: "row", alignItems: "center"}}>
                 <Image
-                    source={{uri: getLogo(homeTeam)}}
+                    source={getLogo(homeTeam)}
                     style={{width: 25, height: 25, marginRight: 5}}
                     resizeMode="contain"
                 />

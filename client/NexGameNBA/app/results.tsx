@@ -60,7 +60,7 @@ export default function Results() {
         marginVertical: 5
       }}>
         <Image
-          source={{uri: getLogo(params.winnerFullName)}}
+          source={getLogo(params.winnerFullName)}
           style={{width: 50, height: 50, margin: 5}}
           resizeMode="contain"
         />
@@ -94,14 +94,16 @@ export default function Results() {
           home={params.home}
           awayScore={params.awayQ1}
           homeScore={params.homeQ1}
-          totalScore={params.awayQ1 + params.homeQ1}/>
+          totalScore={params.awayQ1 + params.homeQ1}
+          color={colors.routeButtonColor}/>
         <ResultContainer
           text={"2nd Quarter"}
           away={params.away}
           home={params.home}
           awayScore={params.awayQ2}
           homeScore={params.homeQ2}
-          totalScore={params.awayQ2 + params.homeQ2}/>
+          totalScore={params.awayQ2 + params.homeQ2}
+          color={colors.routeButtonColor}/>
         <ResultContainer
           text={"2nd Half"}
           away={params.away}
@@ -116,21 +118,24 @@ export default function Results() {
           home={params.home}
           awayScore={params.awayQ3}
           homeScore={params.homeQ3}
-          totalScore={params.awayQ3 + params.homeQ3}/>
+          totalScore={params.awayQ3 + params.homeQ3}
+          color={colors.routeButtonColor}/>
         <ResultContainer
           text={"4th Quarter"}
           away={params.away}
           home={params.home}
           awayScore={params.awayQ4}
           homeScore={params.homeQ4}
-          totalScore={params.awayQ4 + params.homeQ4}/>
+          totalScore={params.awayQ4 + params.homeQ4}
+          color={colors.routeButtonColor}/>
         <ResultContainer
           text={"Over Time"}
           away={params.away}
           home={params.home}
           awayScore={params.awayOT}
           homeScore={params.homeOT}
-          totalScore={params.awayOT + params.homeOT}/>
+          totalScore={params.awayOT + params.homeOT}
+          color={colors.routeButtonColor}/>
       </ScrollView>
     </SafeAreaView>
   );

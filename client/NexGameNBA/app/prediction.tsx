@@ -221,7 +221,7 @@ export default function Prediction() {
         marginVertical: 5
       }}>
         <Image
-          source={{uri: getLogo(params.winnerTeam)}}
+          source={getLogo(params.winnerTeam)}
           style={{width: 50, height: 50, margin: 5}}
           resizeMode="contain"
         />

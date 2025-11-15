@@ -12,7 +12,7 @@ export default function AwayHome({away, home}: AwayHomeProps){
         <View style={{margin: 5, alignItems: "center", width: "45%"}}>
           <Text style={{color: colors.white, textAlign: "center"}}>Away</Text>
           <Image
-            source={{uri: getLogo(away)}}
+            source={getLogo(away)}
             style={{width: 50, height: 50, marginVertical: 10}}
             resizeMode="contain"
           />
@@ -35,7 +35,7 @@ export default function AwayHome({away, home}: AwayHomeProps){
         <View style={{margin: 5, alignItems: "center", width: "45%"}}>
           <Text style={{color: colors.white, textAlign: "center"}}>Home</Text>
           <Image
-            source={{uri: getLogo(home)}}
+            source={getLogo(home)}
             style={{width: 50, height: 50, marginVertical: 10}}
             resizeMode="contain"
           />

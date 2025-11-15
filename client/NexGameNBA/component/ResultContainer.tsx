@@ -28,7 +28,7 @@ export default function ResultContainer({text, away, home, awayScore, homeScore,
                         {away}
                     </Text>
                     <Image
-                        source={{uri: getLogo(away)}}
+                        source={getLogo(away)}
                         style={{width: 30, height: 30, margin: 5}}
                         resizeMode="contain"
                     />
@@ -47,7 +47,7 @@ export default function ResultContainer({text, away, home, awayScore, homeScore,
                 </View>
                 <View style={{flexDirection: "row", alignItems: "center"}}>
                     <Image
-                        source={{uri: getLogo(home)}}
+                        source={getLogo(home)}
                         style={{width: 30, height: 30, margin: 5}}
                         resizeMode="contain"
                     />
