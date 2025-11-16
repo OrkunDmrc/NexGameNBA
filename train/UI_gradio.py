@@ -1,24 +1,6 @@
 import pandas as pd
 import gradio as gr
 import joblib
-import requests
-
-def request(regular, playoffs, away, home, spread, total, moneyline_away, moneyline_home):
-    url = "http://127.0.0.1:8000/get_total_winner_results"
-    data = {
-        "regular": regular,
-        "playoffs": playoffs,
-        "away": away,
-        "home": home,
-        "spread": spread,
-        "total": total,
-        "moneyline_away": moneyline_away,
-        "moneyline_home": moneyline_home
-    }
-    response = requests.post(url, json=data)
-    if(response.ok):
-        print(response.json())
-
 
 winner_team_model = joblib.load('winner_team_pkls/winner_team_gradientboostingclassifier_model.pkl')
 winner_team_le_away = joblib.load('winner_team_pkls/winner_team_label_encoder_away.pkl')
@@ -30,27 +12,27 @@ total_score_le_away = joblib.load('total_score_pkls/total_score_label_encoder_aw
 total_score_le_home = joblib.load('total_score_pkls/total_score_label_encoder_home.pkl')
 print("total score", joblib.load("total_score_pkls/total_score_features.pkl"))
 
-total_score_q1_model = joblib.load('total_score_q1_pkls/total_score_random_forest_model.pkl')
+total_score_q1_model = joblib.load('total_score_q1_pkls/total_score_q1_random_forest_model.pkl')
 #total_score_le_away = joblib.load('total_score_q1_pkls/total_score_not_2025_label_encoder_away.pkl')
 #total_score_le_home = joblib.load('total_score_q1_pkls/total_score_not_2025_label_encoder_home.pkl')
 print("q1 total score", joblib.load("total_score_q1_pkls/total_score_features.pkl"))
 
-total_score_q2_model = joblib.load('total_score_q2_pkls/total_score_random_forest_model.pkl')
+total_score_q2_model = joblib.load('total_score_q2_pkls/total_score_q2_random_forest_model.pkl')
 #total_score_le_away = joblib.load('total_score_q2_pkls/total_score_not_2025_label_encoder_away.pkl')
 #total_score_le_home = joblib.load('total_score_q2_pkls/total_score_not_2025_label_encoder_home.pkl')
 print("q2 total score", joblib.load("total_score_q2_pkls/total_score_features.pkl"))
 
-total_score_q3_model = joblib.load('total_score_q3_pkls/total_score_random_forest_model.pkl')
+total_score_q3_model = joblib.load('total_score_q3_pkls/total_score_q3_random_forest_model.pkl')
 #total_score_le_away = joblib.load('total_score_q3_pkls/total_score_not_2025_label_encoder_away.pkl')
 #total_score_le_home = joblib.load('total_score_q3_pkls/total_score_not_2025_label_encoder_home.pkl')
 print("q3 total score", joblib.load("total_score_q3_pkls/total_score_features.pkl"))
 
-total_score_q4_model = joblib.load('total_score_q4_pkls/total_score_random_forest_model.pkl')
+total_score_q4_model = joblib.load('total_score_q4_pkls/total_score_q4_random_forest_model.pkl')
 #total_score_le_away = joblib.load('total_score_q4_pkls/total_score_not_2025_label_encoder_away.pkl')
 #total_score_le_home = joblib.load('total_score_q4_pkls/total_score_not_2025_label_encoder_home.pkl')
 print("q4 total score", joblib.load("total_score_q4_pkls/total_score_features.pkl"))
 
-total_score_ot_model = joblib.load('total_score_ot_pkls/total_score_random_forest_model.pkl')
+total_score_ot_model = joblib.load('total_score_ot_pkls/total_score_ot_random_forest_model.pkl')
 #total_score_le_away = joblib.load('total_score_ot_pkls/total_score_not_2025_label_encoder_away.pkl')
 #total_score_le_home = joblib.load('total_score_ot_pkls/total_score_not_2025_label_encoder_home.pkl')
 print("ot total score", joblib.load("total_score_ot_pkls/total_score_features.pkl"))

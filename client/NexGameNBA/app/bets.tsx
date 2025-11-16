@@ -1,5 +1,5 @@
 import { request } from "@/api/client";
-import { WinnerTotalScorePrediction } from "@/api/objects";
+import { NexGameNBAPred } from "@/api/objects";
 import AwayHome from "@/component/AwayHome";
 import BaseTextInput from "@/component/BaseTextInput";
 import Line from "@/component/Line";
@@ -8,9 +8,9 @@ import { ConnectionContext } from "@/contexts/ConnectionContext";
 import { router, useFocusEffect } from "expo-router";
 import { useSearchParams } from "expo-router/build/hooks";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { ActivityIndicator, Keyboard, ScrollView, View } from "react-native";
+import { ActivityIndicator, Keyboard, ScrollView, Text, View } from "react-native";
+import { AdEventType, RewardedAd, RewardedAdEventType } from "react-native-google-mobile-ads";
 import { adIds, colors } from "./utils";
-import { AdEventType, RewardedAd, RewardedAdEventType, RewardedInterstitialAd, TestIds } from "react-native-google-mobile-ads";
 
 const adUnitId = adIds.rewardedAdId;
 const rewarded = RewardedAd.createForAdRequest(adUnitId, {
@@ -18,20 +18,20 @@ const rewarded = RewardedAd.createForAdRequest(adUnitId, {
 });
 
 export default function Bets() {
-  const [adLoaded, setAdLoaded] = useState<boolean>(false);
+  //const [adLoaded, setAdLoaded] = useState<boolean>(false);
   useFocusEffect(
     useCallback(() => {
       const unsubscribeLoaded = rewarded.addAdEventListener(
         RewardedAdEventType.LOADED,
         () => {
-          setAdLoaded(true);
+          //setAdLoaded(true);
           console.log("Rewarded loaded successfully");
         },
       );
       const unsubscribeEarned = rewarded.addAdEventListener(
         RewardedAdEventType.EARNED_REWARD,
         reward => {
-          setAdLoaded(false);
+          //setAdLoaded(false);
           console.log('User earned reward of ', reward);
         },
       );
@@ -39,7 +39,6 @@ export default function Bets() {
         AdEventType.ERROR,
         (error) => {
           console.log("Rewarded ERROR:", error);
-          setIsLoading(() => false);
         }
       );
       console.log("Rewarded loading...");
@@ -51,23 +50,14 @@ export default function Bets() {
       };
     }, [])
   );
-
-  const [away, home, postSeason] = useSearchParams();
+  const [date, away, home] = useSearchParams();
   const params = {
+    date: date[1],
     away: away[1],
-    home: home[1],
-    postseason: postSeason[1].toLowerCase() === "true"
+    home: home[1]
   }
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [spread, setSpread] = useState<string>("");
-  const [spreadError, setSpreadError] = useState<string>("");
-  const [total, setTotal] = useState<string>("");
-  const [totalError, setTotalError] = useState<string>("");
-  const [moneylineAway, setMoneylineAway] = useState<string>("");
-  const [moneylineAwayError, setMoneylineAwayError] = useState<string>("");
-  const [moneylineHome, setMoneylineHome] = useState<string>("");
-  const [moneylineHomeError, setMoneylineHomeError] = useState<string>("");
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [nexGameNBAPred, setNexGameNBAPred] = useState<NexGameNBAPred | null>(null);
   const connectionContext = useContext(ConnectionContext);
   if(!connectionContext){
       throw new Error("Connection error");
@@ -80,7 +70,14 @@ export default function Bets() {
     const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
       setKeyboardHeight(0);
     });
-
+    try{
+      request.supabase.getPredictions(params.date, params.away, params.home)
+      .then(data => {
+        setNexGameNBAPred(data as NexGameNBAPred)
+      });
+    }catch(e){
+      console.log("error", e);
+    }
     return () => {
       showSubscription.remove();
       hideSubscription.remove();
@@ -94,75 +91,44 @@ export default function Bets() {
     }
     return odds;
   }
-  async function submit(){
-    setSpreadError("");
-    setTotalError("");
-    setMoneylineAwayError("");
-    setMoneylineHomeError("");
-    if(spread === ""){
-      setSpreadError("This field is required.");
-      return;
-    }else if(!Number.isFinite(Number(spread))){
-      setSpreadError("This field must be number.");
-      return;
-    }else if(total === ""){
-      setTotalError("This field is required.");
-      return;
-    }else if(!Number.isFinite(Number(total))){
-      setTotalError("This field must be number.");
-      return;
-    }else if(moneylineAway === ""){
-      setMoneylineAwayError("This field is required.");
-      return;
-    }else if(!Number.isFinite(Number(moneylineAway))){
-      setMoneylineAwayError("This field must be number.");
-      return;
-    }else if(moneylineHome === ""){
-      setMoneylineHomeError("This field is required.");
-      return;
-    }else if(!Number.isFinite(Number(moneylineHome))){
-      setMoneylineHomeError("This field must be number.");
-      return;
+  function decimalToAmerican(decimal: number): number {
+    if (decimal >= 2.0) {
+      return Math.round((decimal - 1) * 100);
+    } else {
+      return Math.round(-100 / (decimal - 1));
     }
-    setIsLoading(() => true);
-    const moneylineAwayNum = Number(moneylineAway);
-    const moneylineHomeNum = Number(moneylineHome);
-    request.train.getTotalWinnerPred({
-      regular: params.postseason === false,
-      playoffs: params.postseason === true,
-      away: params.away,
-      home: params.home,
-      spread: Number(spread.replace(",",".")),
-      total: Number(total.replace(",",".")),
-      moneyline_away: americanToDecimal(moneylineAwayNum),
-      moneyline_home: americanToDecimal(moneylineHomeNum)
-    }).then(res => {
-      if(res.status === 200){
-        setIsConnected(true);
-        const prediction = res.data as WinnerTotalScorePrediction
-        setIsLoading(() => false);
-        router.push({
-          pathname: "/prediction",
-          params: {
-            winnerTeam: prediction.winner_team,
-            totalScore: prediction.total_score,
-            away: params.away,
-            home: params.home,
-            regular: (params.postseason === false).toString(),
-            playoffs: (params.postseason === true).toString(),
-            total: total,
-            spread: spread,
-            moneylineAway: moneylineAway,
-            moneylineHome: moneylineHome
-          }
-        });
-      }else{
-        setIsConnected(false);
-      }
-      setIsLoading(() => false);
-    });
-    rewarded.show();
   }
+  function formatDate(date: Date): string {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+  function submit(){
+    rewarded.show();
+    router.push({
+      pathname: "/prediction",
+      params: {
+        date: nexGameNBAPred?.date,
+        regular: "" + nexGameNBAPred?.regular,
+        playoff:  "" + nexGameNBAPred?.playoff,
+        away: nexGameNBAPred?.away,
+        home: nexGameNBAPred?.home,
+        spread: nexGameNBAPred?.spread,
+        total: nexGameNBAPred?.total,
+        away_moneyline: nexGameNBAPred?.away_moneyline,
+        home_moneyline: nexGameNBAPred?.home_moneyline,
+        total_score: nexGameNBAPred?.total_score,
+        q1_score: nexGameNBAPred?.q1_score,
+        q2_score: nexGameNBAPred?.q2_score,
+        q3_score: nexGameNBAPred?.q3_score,
+        q4_score: nexGameNBAPred?.q4_score,
+        ot_score: nexGameNBAPred?.ot_score,
+        winner: nexGameNBAPred?.winner
+      }
+    });
+  }
+  
   return (
     <View
       style={{
@@ -175,17 +141,23 @@ export default function Bets() {
     >
       <AwayHome away={params.away} home={params.home}/>
       <Line />
-      <ScrollView style={{width: "100%", marginBottom: keyboardHeight ? keyboardHeight : 0}}>
-        <BaseTextInput value={spread} onChange={(e) => setSpread(e.nativeEvent.text)} text="Spread" errorText={spreadError} maxLength={2}/>
-        <BaseTextInput value={total} onChange={(e) => setTotal(e.nativeEvent.text)} text="Total" errorText={totalError} maxLength={5}/>
-        <BaseTextInput value={moneylineAway} onChange={(e) => setMoneylineAway(e.nativeEvent.text)} text="Moneyline Away" errorText={moneylineAwayError} maxLength={5}/>
-        <BaseTextInput value={moneylineHome} onChange={(e) => setMoneylineHome(e.nativeEvent.text)} text="Moneyline Home" errorText={moneylineHomeError} maxLength={5}/>
-        {isLoading ?
-        <View style={{alignItems: "center", justifyContent: "center", margin: 4 }}>
-            <ActivityIndicator size="large" color={colors.white}/>
-        </View>
-        : <SubmitButton text={adLoaded ? "PREDICT" : "Loading..."} onPress={submit} disabled={!adLoaded}/>}
-      </ScrollView>
+      {
+        params.date !== formatDate(new Date()) ?
+        <View style={{alignItems: "center", justifyContent: "center" }}>
+          <Text style={{color: colors.white, fontWeight: "bold", textAlign: "center" }}>No moneyline data is available for today.</Text>
+        </View> :
+        !nexGameNBAPred ?
+        <View style={{alignItems: "center", justifyContent: "center" }}>
+          <ActivityIndicator size="large" color={colors.white}/>
+        </View> :
+        <ScrollView style={{width: "100%", marginBottom: keyboardHeight ? keyboardHeight : 0}}>
+          <BaseTextInput editable={false} value={"" + nexGameNBAPred?.spread} text="Spread"/>
+          <BaseTextInput editable={false} value={"" + nexGameNBAPred?.total} text="Total"/>
+          <BaseTextInput editable={false} value={`${nexGameNBAPred?.away_moneyline} (${decimalToAmerican(nexGameNBAPred?.away_moneyline!)})`} text="Moneyline Away"/>
+          <BaseTextInput editable={false} value={`${nexGameNBAPred?.home_moneyline} (${decimalToAmerican(nexGameNBAPred?.home_moneyline!)})`} text="Moneyline Home"/>
+          <SubmitButton text={"PREDICT"} onPress={submit}/>
+        </ScrollView>
+      }
     </View>
   );
 }

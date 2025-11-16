@@ -1,12 +1,18 @@
 
 import { toast } from "@/component/toast";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createClient, processLock } from '@supabase/supabase-js';
 import axios, { AxiosError } from "axios";
-import { BetsForm } from "./objects";
+import { BetsForm, NexGameNBAPred } from "./objects";
+
 const configs = require("../config.json");
 
 //axios.defaults.withCredentials = true;
 
 const baseURL = configs["workmode"] === "dev" ? configs["devURL"] : configs["prodURL"];
+const supabaseUrl = configs["supabaseUrl"];
+const supabaseKey = configs["supabaseKey"];
+
 axios.interceptors.request.use(request => {
   request.headers["Content-Type"] = "application/json";
   if(request.url?.includes("balldontlie")){
@@ -80,7 +86,40 @@ const train = {
   getTotalScoreOTPred: async (data: BetsForm) => await methods.post(`${baseURL}/get_total_score_ot_prediction`, data)
 }
 
+export const supabaseClient = createClient(
+  supabaseUrl!,
+  supabaseKey!,
+  {
+    auth: {
+      storage: AsyncStorage,
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: false,
+      lock: processLock
+    },
+  })
+
+const supabase = {
+  getPredictions: async (date: string, away: string, home: string) => {
+    try {
+      const { data: nexgamenbapred, error } = await supabaseClient.from('nexgamenbapred')
+      .select("*").eq("date", date).eq("away", away).eq("home", home);
+      if (error) {
+        console.error('Error fetching todos:', error.message);
+        return null;
+      }
+      const nexGameNBAPred = nexgamenbapred[0] as NexGameNBAPred
+      return nexGameNBAPred;
+    } catch (e) {
+      console.error('Error fetching todos:', e);
+      return null;
+    }
+  }
+  
+}
+
 export const request = {
     balldontlie,
-    train
+    train,
+    supabase,
 }

@@ -47,7 +47,7 @@ const logos: Record<string, any> = {
   'Memphis Grizzlies':require('../assets/logos/Memphis Grizzlies.png')
 };
 
-const getFullName = (name: string) =>  {
+export const getFullName = (name: string) =>  {
   const list = [
     'Portland Trail Blazers',
     'Utah Jazz',
@@ -90,6 +90,3 @@ export const adIds = {
   rewardedAdId: configs["workmode"] === "dev" ? TestIds.REWARDED : configs["rewardedUnitId"],
   rewardedIntAdId: configs["workmode"] === "dev" ? TestIds.REWARDED_INTERSTITIAL : TestIds.REWARDED_INTERSTITIAL
 }
-
-
-//  //ssl.gstatic.com/onebox/media/sports/logos/_bgagBCd6ieOIt3INWRN_w_96x96.png

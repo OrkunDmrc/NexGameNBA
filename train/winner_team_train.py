@@ -8,7 +8,7 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.neighbors import KNeighborsClassifier
-import xgboost as xgb
+#import xgboost as xgb
 from sklearn.svm import SVC
 import joblib
 

@@ -77,3 +77,22 @@ export interface TotalScoreQ4Prediction {
 export interface TotalScoreOTPrediction {
   total_score_ot: number
 }
+
+export interface NexGameNBAPred {
+  date?: string,
+  regular?: boolean,
+  playoff?: boolean,
+  away?: string,
+  home?: string,
+  spread?: number,
+  total?: number,
+  away_moneyline?: number,
+  home_moneyline?: number,
+  total_score?: number,
+  q1_score?: number,
+  q2_score?: number,
+  q3_score?: number,
+  q4_score?: number,
+  ot_score?: number,
+  winner?: string,
+}

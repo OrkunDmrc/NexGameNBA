@@ -35,11 +35,11 @@ export default function Main(){
     const {isConnected, setIsConnected} = connectionContext;
     return (
         <SafeAreaProvider style={{paddingTop: Constants.statusBarHeight, backgroundColor: colors.primaryColor}}>
-            <View style={{backgroundColor: isConnected ? colors.green : colors.secondaryColor, width: "100%", flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
+            {/*<View style={{backgroundColor: isConnected ? colors.green : colors.secondaryColor, width: "100%", flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
                 <Text style={{color: "white", fontSize: 12, textAlign: "center", fontWeight: "bold", padding:1}}>
                 {isConnected ? "Server connected" : "Connecting to the server..."}
                 </Text>
-            </View>
+            </View>*/}
             <View style={{flexDirection: "row", padding: 10, height: 95, justifyContent: "center", alignItems: "center"}}>
                 <Image
                     source={require('../assets/images/nba.png')}

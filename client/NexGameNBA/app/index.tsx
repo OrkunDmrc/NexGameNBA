@@ -8,7 +8,7 @@ import { DateContext } from "@/contexts/DateContext";
 import { router } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
-import { colors } from "./utils";
+import { colors, getFullName } from "./utils";
 
 export default function Index() {
   const dateContext = useContext(DateContext);
@@ -26,10 +26,13 @@ export default function Index() {
     const res = await request.balldontlie.getGamesByDate(`${year}-${month}-${day}`);
     if(res.data){
       const games = res.data as Array<Game>;
+      games.forEach(game => {
+        game.visitor_team!.full_name = getFullName(game.visitor_team?.name!);
+        game.home_team!.full_name = getFullName(game.home_team?.name!);
+      });
       setMaches(games);
       setLoading(false);
     }
-    
   }
   useEffect(() => {
     const now = new Date();
@@ -100,9 +103,9 @@ export default function Index() {
               router.push({
                 pathname: "/bets",
                 params: {
+                  date: match.date,
                   away: match.visitor_team?.full_name,
-                  home: match.home_team?.full_name,
-                  postseason: match.postseason?.toString()
+                  home: match.home_team?.full_name
                 }
               });
             }} />

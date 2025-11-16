@@ -37,7 +37,7 @@ print("count:", df['away'].count())
 
 models = {
     #'Linear Regression': LinearRegression(),
-    'Random Forest': RandomForestRegressor(n_estimators=200),
+    'Random Forest': RandomForestRegressor(),
     #'Gradient Boosting': GradientBoostingRegressor(),
     #'XGBoost': XGBRegressor(),
     #'SVR': SVR()
@@ -62,7 +62,7 @@ for name, model in models.items():
 
 print(f"Best Model: {best_model_name} with R2 Score: {best_r2:.4f}")
 
-joblib.dump(best_model_obj, f"total_score_ot_pkls/total_score_ot_{best_model_name.replace(' ', '_').lower()}_model.pkl", compress=("lzma", 3))
+joblib.dump(best_model_obj, f"total_score_ot_pkls/total_score_ot_{best_model_name.replace(' ', '_').lower()}_model.pkl")
 joblib.dump(X_train.columns.tolist(), "total_score_ot_pkls/total_score_features.pkl")
 joblib.dump(le_away, 'total_score_ot_pkls/total_score_label_encoder_away.pkl')
 joblib.dump(le_home, 'total_score_ot_pkls/total_score_label_encoder_home.pkl')
