@@ -23,6 +23,7 @@ export default function SubmitButton({text, onPress, disabled=false}: SubmitButt
             shadowOpacity: 0.25,
             shadowRadius: 4,
             elevation: 8,
+            paddingHorizontal: 5,
             marginVertical: 10}}
             onPress={onPress}
             disabled={disabled}

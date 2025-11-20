@@ -105,7 +105,11 @@ export default function Bets() {
     return `${y}-${m}-${d}`;
   }
   function submit(){
-    rewarded.show();
+    try{
+      rewarded.show();
+    }catch(e){
+      console.log(e);
+    }
     router.push({
       pathname: "/prediction",
       params: {
@@ -128,7 +132,6 @@ export default function Bets() {
       }
     });
   }
-  
   return (
     <View
       style={{

@@ -7,6 +7,7 @@ import joblib
 import pandas as pd
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+import requests
 import uvicorn
 import psycopg2
 import time
@@ -34,6 +35,7 @@ BALLEDONTLIE_API_KEY = os.getenv("BALLEDONTLIE_API_KEY")
 SERVICE_API_KEY = os.getenv("SERVICE_API_KEY")
 SUPABASE_TOKEN = os.getenv("SUPABASE_TOKEN")
 WORK_MODE = os.getenv("WORK_MODE")
+ODDS_API_KEY = os.getenv("ODDS_API_KEY")
 
 def verify_api_key(request: Request):
     client_key = request.headers.get("Authorization") or ""
@@ -85,71 +87,102 @@ def get_prediction(item, model):
 def read_root():
     return {"message": "Hello, world!"}
 
-@app.post("/get_and_insert")
-def get_and_insert(item: PredictionInput):
-    waiting_time = int(os.getenv("WAITING_TIME"))
-    winner = get_winner_prediction(item)
-    time.sleep(waiting_time)
-    total_socre = get_total_score_prediction(item)
-    time.sleep(waiting_time)
-    q1_socre = get_total_score_q1_prediction(item)
-    time.sleep(waiting_time)
-    q2_socre = get_total_score_q2_prediction(item)
-    time.sleep(waiting_time)
-    q3_socre = get_total_score_q3_prediction(item)
-    time.sleep(waiting_time)
-    q4_socre = get_total_score_q4_prediction(item)
-    time.sleep(waiting_time)
-    ot_socre = get_total_score_ot_prediction(item)
-    time.sleep(waiting_time)
-    try:
-        connection = psycopg2.connect(
-            user=os.getenv("SUPABASE_USER"),
-            password=os.getenv("SUPABASE_PASSWORD"),
-            host=os.getenv("SUPABASE_HOST"),
-            port=os.getenv("SUPABASE_PORT"),
-            dbname=os.getenv("SUPABASE_DBNAME")
-        )
-        print("Connection successful!")
-        cursor = connection.cursor()
-        cursor.execute("""
-                INSERT INTO nexgamenbapred (
-                    date, regular, playoff, away, home, spread, total,
-                    away_moneyline, home_moneyline,
-                    total_score, q1_score, q2_score, q3_score, q4_score, ot_score,
-                    winner
+@app.get("/insert")
+def insert():
+    today = "2025-11-20"
+    url = "https://api.the-odds-api.com/v4/sports/basketball_nba/odds"
+    params = {
+        "apiKey": ODDS_API_KEY,
+        "regions": "us",
+        "markets": "h2h,spreads,totals",
+        "oddsFormat": "decimal",        
+        "dateFormat": "iso",
+        "oddsDate": today,
+        "bookmakers": "fanduel"
+    }
+
+    response = requests.get(url, params=params)
+
+    data = response.json()
+    for game in data:
+        if len(game["bookmakers"]) != 0:
+            markets = game["bookmakers"][0]["markets"]
+            item = PredictionInput(
+                date=today,
+                regular=True,
+                playoffs=False,
+                away=game["away_team"],
+                home=game["home_team"],
+                spread=abs(markets[1]["outcomes"][0]["point"]),
+                total=markets[2]["outcomes"][0]["point"],
+                moneyline_away=
+                markets[0]["outcomes"][1]["price"] 
+                if markets[0]["outcomes"][1]["name"] == game["away_team"] 
+                else markets[0]["outcomes"][0]["price"],
+                moneyline_home=
+                markets[0]["outcomes"][0]["price"] 
+                if markets[0]["outcomes"][0]["name"] == game["home_team"]
+                else markets[0]["outcomes"][1]["price"]
+            )
+            waiting_time = int(os.getenv("WAITING_TIME"))
+            winner = get_winner_prediction(item)
+            time.sleep(waiting_time)
+            total_socre = get_total_score_prediction(item)
+            time.sleep(waiting_time)
+            q1_socre = get_total_score_q1_prediction(item)
+            time.sleep(waiting_time)
+            q2_socre = get_total_score_q2_prediction(item)
+            time.sleep(waiting_time)
+            q3_socre = get_total_score_q3_prediction(item)
+            time.sleep(waiting_time)
+            q4_socre = get_total_score_q4_prediction(item)
+            time.sleep(waiting_time)
+            ot_socre = get_total_score_ot_prediction(item)
+            time.sleep(waiting_time)
+            try:
+                connection = psycopg2.connect(
+                    user=os.getenv("SUPABASE_USER"),
+                    password=os.getenv("SUPABASE_PASSWORD"),
+                    host=os.getenv("SUPABASE_HOST"),
+                    port=os.getenv("SUPABASE_PORT"),
+                    dbname=os.getenv("SUPABASE_DBNAME")
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """, (
-                item.date,          # date (nullable)
-                item.regular,          # regular
-                item.playoffs,         # playoff
-                item.away,      # away
-                item.home,     # home
-                item.spread,          # spread
-                item.total,         # total
-                item.moneyline_away,           # away_moneyline
-                item.moneyline_home,          # home_moneyline
-                total_socre["total_score"],          # total_score
-                q1_socre["total_score_q1"],          # q1_score
-                q2_socre["total_score_q2"],          # q2_score
-                q3_socre["total_score_q3"],          # q3_score
-                q4_socre["total_score_q4"],          # q4_score
-                ot_socre["total_score_ot"],          # ot_score
-                winner["winner_team"]           # winner
-            ))
-        connection.commit()
-        cursor.close()
-        connection.close()
-        print("Connection closed.")
-        return get_predictions(GetItem(
-            date=item.date,
-            away=item.away,
-            home=item.home
-        ))
-    except Exception as e:
-        print(f"Failed to connect: {e}")
-        return f"Failed to connect: {e}"
+                print("Connection successful!")
+                cursor = connection.cursor()
+                cursor.execute("""
+                        INSERT INTO nexgamenbapred (
+                            date, regular, playoff, away, home, spread, total,
+                            away_moneyline, home_moneyline,
+                            total_score, q1_score, q2_score, q3_score, q4_score, ot_score,
+                            winner
+                        )
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """, (
+                        item.date,          # date (nullable)
+                        item.regular,          # regular
+                        item.playoffs,         # playoff
+                        item.away,      # away
+                        item.home,     # home
+                        item.spread,          # spread
+                        item.total,         # total
+                        item.moneyline_away,           # away_moneyline
+                        item.moneyline_home,          # home_moneyline
+                        total_socre["total_score"],          # total_score
+                        q1_socre["total_score_q1"],          # q1_score
+                        q2_socre["total_score_q2"],          # q2_score
+                        q3_socre["total_score_q3"],          # q3_score
+                        q4_socre["total_score_q4"],          # q4_score
+                        ot_socre["total_score_ot"],          # ot_score
+                        winner["winner_team"]           # winner
+                    ))
+                connection.commit()
+                cursor.close()
+                connection.close()
+                print("Connection closed.")
+            except Exception as e:
+                print(f"Failed to connect: {e}")
+                return f"Failed to connect"
+    return {"message": today + " inserted"}
 
 @app.post("/get_predictions")
 def get_predictions(item: GetItem):

@@ -1,4 +1,17 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TestIds } from "react-native-google-mobile-ads";
+
+const configs = require("../config.json");
+
+export const contractAcception = {
+  getIsContractAccepted: async () => {
+    const value = await AsyncStorage.getItem("isContractAccepted");
+    return value === "1" ? 1 : 0;
+  },
+  setContractAccepted: async () => {
+    await AsyncStorage.setItem("isContractAccepted", "1");
+  },
+};
 
 export const colors = {
     primaryColor: "#00438C",
@@ -82,11 +95,11 @@ export const getFullName = (name: string) =>  {
     return list.find((e) => e.includes(name))?.toString();
 } 
 
-const configs = require("../config.json");
-
 export const adIds = {
   appOpenAdId: configs["workmode"] === "dev" ? TestIds.APP_OPEN : configs["appOpenUnitId"],
   bannerAdId: configs["workmode"] === "dev" ? TestIds.ADAPTIVE_BANNER : configs["bannerUnitId"],
   rewardedAdId: configs["workmode"] === "dev" ? TestIds.REWARDED : configs["rewardedUnitId"],
   rewardedIntAdId: configs["workmode"] === "dev" ? TestIds.REWARDED_INTERSTITIAL : TestIds.REWARDED_INTERSTITIAL
 }
+
+

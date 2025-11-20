@@ -52,7 +52,7 @@ export default function Results() {
       <Text style={{color: colors.white}}>Winner</Text>
       <View style={{
         flexDirection: "row",
-        justifyContent: "flex-start",
+        //justifyContent: "flex-start",
         alignItems: "center",
         backgroundColor: colors.routeButtonColor,
         borderRadius: 10,

@@ -95,10 +95,9 @@ export default function Prediction() {
       throw new Error("Connection error");
   }
   const {setIsConnected} = connectionContext;
-  const isHomeWinner = params.winner === params.home;
-  const chanceToWin = isHomeWinner ? 1 / params.home_moneyline : 1 / params.away_moneyline;
+  const chanceToWin = Math.abs(params.home_moneyline - params.away_moneyline);
   const winnerTeamRisk = {
-    text: chanceToWin < 0.5 ? "(High Risk)" : chanceToWin < 0.7 ? "(Medium Risk)" : "(Low Risk)",
+    text: chanceToWin < 0.5 ? "(High Risk)" : chanceToWin < 0.75 ? "(Medium Risk)" : "(Low Risk)",
     color: chanceToWin < 0.5 ? colors.secondaryColor : chanceToWin < 0.7 ? colors.yellow : colors.green,
   }
   const totalScoreCal = Math.abs(params.total - params.total_score);
@@ -169,69 +168,61 @@ export default function Prediction() {
       <Line/>
       <ScrollView style={{width: "100%", marginBottom: 0}}>
         <BaseTextInput 
-          value={`${params.total_score} (${params.total_score > params.total ? "Under" : "Over"})`} 
+          value={`Over(${params.total_score - 3}) - Under(${params.total_score + 3})`}
           text={`Total Score ${totalScoreRisk.text}`} 
-          backgroundColor={totalScoreRisk.color} 
+          //backgroundColor={totalScoreRisk.color} 
           editable={false}/>
         <BaseTextInput
-          value={totalScoreh1 < 0 ? totalScoreh1Text : totalScoreh1.toString()}
+          value={(params.q1_score + params.q2_score).toString()/*totalScoreh1 < 0 ? totalScoreh1Text : totalScoreh1.toString()*/}
           text="1st Half Total Score (Medium Risk)"
-          backgroundColor={colors.yellow} 
+          //backgroundColor={colors.yellow} 
           editable={false}
           />
-        {totalScoreq1 < 0 ? 
+        {false/*totalScoreq1 < 0 */? 
         <SubmitButton text={"Click to See 1st Quarter"} onPress={() => getQuarterPred(1)} disabled={!adLoaded}/>
-        : <View style={{paddingHorizontal: 20}}>
-            <BaseTextInput
-              value={totalScoreq1.toString()} 
-              text="1st Quarter Total Score (High Risk)"
-              backgroundColor={colors.secondaryColor}
-              editable={false}/>
-          </View>
+        : <BaseTextInput
+            value={params.q1_score.toString()} 
+            text="1st Quarter Total Score (High Risk)"
+            //backgroundColor={colors.secondaryColor}
+            editable={false}/>
         }
-        {totalScoreq2 < 0 ?
+        {false/*totalScoreq2 < 0*/ ?
         <SubmitButton text={"Click to See 2nd Quarter"} onPress={() => getQuarterPred(2)} disabled={!adLoaded}/>
-        : <View style={{paddingHorizontal: 20}}>
-            <BaseTextInput
-                value={totalScoreq2.toString()} 
-                text="2nd Quarter Total Score (High Risk)"
-                backgroundColor={colors.secondaryColor}
-                editable={false}/>
-          </View>
+        : <BaseTextInput
+            value={params.q2_score.toString()} 
+            text="2nd Quarter Total Score (High Risk)"
+            //backgroundColor={colors.secondaryColor}
+            editable={false}/>
         }
         <BaseTextInput
-          value={totalScoreh2 < 0 ? totalScoreh2Text : totalScoreh2.toString()}
+          value={(params.q3_score + params.q4_score).toString()/*totalScoreh2 < 0 ? totalScoreh2Text : totalScoreh2.toString()*/}
           text="2nd Half Total Score (Medium Risk)"
-          backgroundColor={colors.yellow} 
+          //backgroundColor={colors.yellow} 
           editable={false}
           />
-        {totalScoreq3 < 0 ?<SubmitButton text={"Click to See 3rd Quarter"} onPress={() => getQuarterPred(3)} disabled={!adLoaded}/>
-        : <View style={{paddingHorizontal: 20}}>
-            <BaseTextInput
-                value={totalScoreq3.toString()} 
-                text="3rd Quarter Total Score (High Risk)"
-                backgroundColor={colors.secondaryColor}
-                editable={false}/>
-          </View>
+        {false/*totalScoreq3 < 0*/ ?
+        <SubmitButton text={"Click to See 3rd Quarter"} onPress={() => getQuarterPred(3)} disabled={!adLoaded}/>
+        : <BaseTextInput
+            value={params.q3_score.toString()} 
+            text="3rd Quarter Total Score (High Risk)"
+            //backgroundColor={colors.secondaryColor}
+            editable={false}/>
         }
-        {totalScoreq4 < 0 ? 
+        {false/*totalScoreq4 < 0 */? 
         <SubmitButton text={"Click to See 4th Quarter"} onPress={() => getQuarterPred(4)} disabled={!adLoaded}/>
-        : <View style={{paddingHorizontal: 20}}>
-            <BaseTextInput
-                value={totalScoreq4.toString()} 
-                text="4th Quarter Total Score (High Risk)"
-                backgroundColor={colors.secondaryColor}
-                editable={false}/>
-          </View>
+        : <BaseTextInput
+            value={params.q4_score.toString()} 
+            text="4th Quarter Total Score (High Risk)"
+            //backgroundColor={colors.secondaryColor}
+            editable={false}/>
         }
-        {totalScoreOt < 0 ?
+        {false/*totalScoreOt < 0 */?
         <SubmitButton text={"Click to See Over Time"} onPress={() => getQuarterPred(0)} disabled={!adLoaded}/>
-        : <View style={{paddingHorizontal: 20}}>
-            <BaseTextInput 
-                value={totalScoreOt < 11 ? "0" : totalScoreOt.toString()} 
-                text={`Over Time Total Score ${totalScoreOtRisk.text}`}  
-                backgroundColor={totalScoreOtRisk.color} />
-          </View>
+        : <BaseTextInput 
+            value={totalScoreOt < 11 ? "0" : totalScoreOt.toString()} 
+            text={`Over Time Total Score ${totalScoreOtRisk.text}`}  
+            //backgroundColor={totalScoreOtRisk.color}
+          />
         }
       </ScrollView>
     </View>

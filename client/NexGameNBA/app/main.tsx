@@ -1,11 +1,11 @@
 import { request } from "@/api/client";
+import { ConnectionContext } from "@/contexts/ConnectionContext";
 import { DateProvider } from "@/contexts/DateContext";
+import Constants from 'expo-constants';
 import { Stack, useSegments } from "expo-router";
 import { useContext, useEffect } from "react";
 import { Image, Text, View } from "react-native";
-import mobileAds, { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
-import { ConnectionContext } from "@/contexts/ConnectionContext";
-import Constants from 'expo-constants';
+import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { adIds, colors } from "./utils";
 

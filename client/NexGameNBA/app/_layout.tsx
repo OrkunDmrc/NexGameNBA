@@ -1,12 +1,22 @@
+import Contract from "@/app/contract";
 import { ConnectionProvider } from "@/contexts/ConnectionContext";
+import { useEffect, useState } from "react";
+import MobileAds, { AdEventType, AppOpenAd } from "react-native-google-mobile-ads";
 import Main from "./main";
-import MobileAds, { AdEventType, AppOpenAd, TestIds } from "react-native-google-mobile-ads";
-import { useEffect } from "react";
-import { adIds } from "./utils";
+import { adIds, contractAcception } from "./utils";
+
 
 MobileAds().initialize().then((adapterStatuses) => { /*innitialization complete*/ });
 
 export default function RootLayout() {
+  const [isAccepted, setIsAccepted] = useState<number | null>(null);
+  useEffect(() => {
+    const loadStatus = async () => {
+      const status = await contractAcception.getIsContractAccepted();
+      setIsAccepted(status);
+    };
+    loadStatus();
+  }, []);
   useEffect(() => {
     const adUnitId = adIds.appOpenAdId;
     const appOpenAd = AppOpenAd.createForAdRequest(adUnitId, {
@@ -28,11 +38,7 @@ export default function RootLayout() {
   }, []);
   return (
     <ConnectionProvider>
-      <Main />
+      {isAccepted ? <Main /> : <Contract />}
     </ConnectionProvider>
   )
-  
-
-  
-  
 }
